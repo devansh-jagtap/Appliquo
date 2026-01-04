@@ -2,6 +2,7 @@ import "./App.css";
 import { useState, useEffect, useRef } from "react";
 import ApplicationForm from "./components/applicationForm";
 import ApplicationList from "./components/applicationList";
+import { Faq } from "./components/faq";
 
 function App() {
   const [applications, setApplications] = useState([]);
@@ -59,6 +60,9 @@ function App() {
           onUpdateStatus={handleUpdateStatus}
           onDeleteApplication={handleDeleteApplication}
         />
+      </div>
+      <div>
+        <Faq />
       </div>
     </section>
   );
