@@ -3,11 +3,37 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
+const generatePrompt = (jobDescription, resumeText) => {
+  return `
+You are a professional career coach.
+
+Job Description:
+${jobDescription}
+
+Resume:
+${resumeText}
+
+Provide the response in EXACTLY this format:
+
+RESUME:
+- improvement 1
+- improvement 2
+
+COVER LETTER:
+(write a short tailored cover letter)
+
+SKILLS:
+- missing skill 1
+- missing skill 2
+`;
+};
+
 const Assistant = () => {
   const [jobDescription, setJobDescription] = useState("");
   const [resumeText, setResumeText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
+
   const handleGenerator = async () => {
     if (!jobDescription || !resumeText) {
       alert("Please provide both job description and resume.");
@@ -19,61 +45,54 @@ const Assistant = () => {
 
     try {
       const response = await fetch(
-        "https://api.openai.com/v1/chat/completions",
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${
+          import.meta.env.VITE_GEMINI_API_KEY
+        }`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
           },
           body: JSON.stringify({
-            model: "gpt-4o-mini",
-            messages: [
+            contents: [
               {
                 role: "user",
-                content: generatePrompt(jobDescription, resumeText),
+                parts: [
+                  {
+                    text: generatePrompt(jobDescription, resumeText),
+                  },
+                ],
               },
             ],
-            temperature: 0.7,
           }),
         }
       );
 
-      const data = await response.json();
-      const aiText = data.choices[0].message.content;
-      const parsed = JSON.parse(aiText);
+      if (!response.ok) {
+        throw new Error(`Gemini request failed (${response.status})`);
+      }
 
-      setResult(parsed);
+      const data = await response.json();
+
+      const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (!aiText) {
+        throw new Error("Empty AI response");
+      }
+
+      setResult({
+        resume:
+          aiText.match(/RESUME:([\s\S]*?)COVER LETTER:/)?.[1]?.trim() || "",
+        coverLetter:
+          aiText.match(/COVER LETTER:([\s\S]*?)SKILLS:/)?.[1]?.trim() || "",
+        skills: aiText.match(/SKILLS:([\s\S]*)/)?.[1]?.trim() || "",
+      });
     } catch (error) {
-      console.error(error);
-      alert("Failed to generate AI response.");
+      console.error("GEMINI ERROR:", error);
+      alert(error.message);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const generatePrompt = (jobDescription, resumeText) => {
-    return `
-You are a professional career coach.
-
-Job Description:
-${jobDescription}
-
-Resume:
-${resumeText}
-
-Tasks:
-1. Suggest resume improvements (bullet points).
-2. Write a short tailored cover letter.
-3. Identify missing or weak skills.
-
-Return the response in this JSON format:
-{
-  "resume": "...",
-  "coverLetter": "...",
-  "skills": "..."
-}
-`;
   };
 
   return (
@@ -86,34 +105,37 @@ Return the response in this JSON format:
           </p>
         </header>
 
+        {/* Job Description */}
         <Card>
           <CardHeader>
             <CardTitle>Job Description</CardTitle>
           </CardHeader>
           <CardContent>
             <Textarea
+              rows={6}
               placeholder="Paste the job description here..."
               value={jobDescription}
-              rows={6}
               onChange={(e) => setJobDescription(e.target.value)}
             />
           </CardContent>
         </Card>
 
+        {/* Resume */}
         <Card>
           <CardHeader>
             <CardTitle>Your Resume</CardTitle>
           </CardHeader>
           <CardContent>
             <Textarea
+              rows={6}
               placeholder="Paste your resume text here..."
               value={resumeText}
               onChange={(e) => setResumeText(e.target.value)}
-              rows={6}
             />
           </CardContent>
         </Card>
 
+        {/* Generate Button */}
         <Button
           className="w-full"
           onClick={handleGenerator}
@@ -121,14 +143,14 @@ Return the response in this JSON format:
         >
           {isLoading ? "Generating..." : "Generate Suggestions"}
         </Button>
+
+        {/* Results */}
         <Card>
           <CardHeader>
             <CardTitle>AI Suggestions</CardTitle>
           </CardHeader>
-
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Resume Improvements */}
+            <div className="grid gap-4">
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Resume Improvements</CardTitle>
@@ -139,14 +161,13 @@ Return the response in this JSON format:
                       Resume improvements will appear here.
                     </p>
                   ) : (
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground whitespace-pre-line">
                       {result.resume}
                     </p>
                   )}
                 </CardContent>
               </Card>
 
-              {/* Cover Letter */}
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Cover Letter</CardTitle>
@@ -157,14 +178,13 @@ Return the response in this JSON format:
                       Cover letter draft will appear here.
                     </p>
                   ) : (
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground whitespace-pre-line">
                       {result.coverLetter}
                     </p>
                   )}
                 </CardContent>
               </Card>
 
-              {/* Skill Gap Analysis */}
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Skill Gap Analysis</CardTitle>
@@ -175,7 +195,7 @@ Return the response in this JSON format:
                       Skill gap analysis will appear here.
                     </p>
                   ) : (
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground whitespace-pre-line">
                       {result.skills}
                     </p>
                   )}
