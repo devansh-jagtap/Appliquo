@@ -1,8 +1,8 @@
 import "./App.css";
 import { useState, useEffect, useRef } from "react";
-import ApplicationForm from "./components/applicationForm";
-import ApplicationList from "./components/applicationList";
-import { Faq } from "./components/faq";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
+import Assistant from "./pages/Assistant";
 
 function App() {
   const [applications, setApplications] = useState([]);
@@ -41,30 +41,46 @@ function App() {
   };
 
   return (
-    <section className="min-h-screen bg-background py-8 px-4">
-      <div className="max-w-4xl mx-auto space-y-8">
-        {/* Header */}
-        <header className="text-center">
-          <h1 className="text-5xl font-extrabold text-foreground">Appliquo</h1>
-          <p className="text-muted-foreground text-lg mt-2">
-            AI-powered job application tracking and optimization
-          </p>
-        </header>
+    // <section className="min-h-screen bg-background py-8 px-4">
+    //   <div className="max-w-4xl mx-auto space-y-8">
+    //     {/* Header */}
+    //     <header className="text-center">
+    //       <h1 className="text-5xl font-extrabold text-foreground">Appliquo</h1>
+    //       <p className="text-muted-foreground text-lg mt-2">
+    //         AI-powered job application tracking and optimization
+    //       </p>
+    //     </header>
 
-        {/* Add Application Form */}
-        <ApplicationForm onAddApplication={handleAddApplication} />
+    //     {/* Add Application Form */}
+    //     <ApplicationForm onAddApplication={handleAddApplication} />
 
-        {/* Applications List */}
-        <ApplicationList
-          applications={applications}
-          onUpdateStatus={handleUpdateStatus}
-          onDeleteApplication={handleDeleteApplication}
+    //     {/* Applications List */}
+    //     <ApplicationList
+    //       applications={applications}
+    //       onUpdateStatus={handleUpdateStatus}
+    //       onDeleteApplication={handleDeleteApplication}
+    //     />
+    //   </div>
+    //   <div>
+    //     <Faq />
+    //   </div>
+    // </section>
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Dashboard
+              applications={applications}
+              handleAddApplication={handleAddApplication}
+              handleUpdateStatus={handleUpdateStatus}
+              handleDeleteApplication={handleDeleteApplication}
+            />
+          }
         />
-      </div>
-      <div>
-        <Faq />
-      </div>
-    </section>
+        <Route path="/assistant" element={<Assistant />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
