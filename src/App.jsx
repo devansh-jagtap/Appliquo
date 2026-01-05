@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Assistant from "./pages/Assistant";
+import HeroSectionOne from "./components/hero-section-demo-1";
+import { Layout } from "lucide-react";
 
 function App() {
   const [applications, setApplications] = useState([]);
@@ -67,8 +69,9 @@ function App() {
     // </section>
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<HeroSectionOne />} />
         <Route
-          path="/"
+          path="/dashboard"
           element={
             <Dashboard
               applications={applications}

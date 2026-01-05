@@ -1,7 +1,13 @@
 import React from "react";
 import ApplicationForm from "@/components/applicationForm";
 import ApplicationList from "@/components/applicationList";
-import { Faq } from "../components/faq";
+import Layout from "@/components/Layout";
+import {
+  HiDocumentText,
+  HiClock,
+  HiCheckCircle,
+  HiXCircle,
+} from "react-icons/hi2";
 
 const Dashboard = ({
   applications,
@@ -9,19 +15,101 @@ const Dashboard = ({
   handleUpdateStatus,
   handleDeleteApplication,
 }) => {
-  return (
-    <section className="min-h-screen bg-background py-8 px-4">
-      <div className="max-w-4xl mx-auto space-y-8">
-        {/* Header */}
-        <header className="text-center">
-          <h1 className="text-5xl font-extrabold text-foreground">Appliquo</h1>
-          <p className="text-muted-foreground text-lg mt-2">
-            AI-powered job application tracking and optimization
-          </p>
-        </header>
+  // Calculate stats
+  const totalApplications = applications.length;
+  const pendingApplications = applications.filter(
+    (app) => app.status === "Applied" || app.status === "In Progress"
+  ).length;
+  const acceptedApplications = applications.filter(
+    (app) => app.status === "Accepted" || app.status === "Offer"
+  ).length;
+  const rejectedApplications = applications.filter(
+    (app) => app.status === "Rejected"
+  ).length;
 
-        {/* Add Application Form */}
-        <ApplicationForm onAddApplication={handleAddApplication} />
+  const stats = [
+    {
+      title: "Total Applications",
+      value: totalApplications,
+      icon: HiDocumentText,
+      color: "blue",
+    },
+    {
+      title: "Pending",
+      value: pendingApplications,
+      icon: HiClock,
+      color: "blue",
+    },
+    {
+      title: "Accepted",
+      value: acceptedApplications,
+      icon: HiCheckCircle,
+      color: "blue",
+    },
+    {
+      title: "Rejected",
+      value: rejectedApplications,
+      icon: HiXCircle,
+      color: "gray",
+    },
+  ];
+
+  return (
+    <Layout>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Dashboard
+          </h1>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
+            Track and manage your job applications
+          </p>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat, index) => {
+            const Icon = stat.icon;
+            return (
+              <div
+                key={index}
+                className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                      {stat.title}
+                    </p>
+                    <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
+                      {stat.value}
+                    </p>
+                  </div>
+                  <div
+                    className={`flex h-12 w-12 items-center justify-center rounded-lg ${
+                      stat.color === "blue"
+                        ? "bg-blue-100 dark:bg-blue-900/30"
+                        : "bg-gray-100 dark:bg-gray-800"
+                    }`}
+                  >
+                    <Icon
+                      className={`h-6 w-6 ${
+                        stat.color === "blue"
+                          ? "text-blue-600"
+                          : "text-gray-600 dark:text-gray-400"
+                      }`}
+                    />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Application Form */}
+        <div className="mb-8">
+          <ApplicationForm onAddApplication={handleAddApplication} />
+        </div>
 
         {/* Applications List */}
         <ApplicationList
@@ -30,10 +118,7 @@ const Dashboard = ({
           onDeleteApplication={handleDeleteApplication}
         />
       </div>
-      <div>
-        <Faq />
-      </div>
-    </section>
+    </Layout>
   );
 };
 
