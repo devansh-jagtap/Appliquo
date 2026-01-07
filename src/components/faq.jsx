@@ -31,10 +31,15 @@ export function Faq() {
           </AccordionTrigger>
           <AccordionContent className="flex flex-col gap-3 text-gray-600 dark:text-gray-400">
             <p>
-              Appliquo is an AI-powered job application tracking platform designed to streamline your job search process. It helps you organize all your applications in one place, track their status, and never miss important follow-ups.
+              Appliquo is an AI-powered job application tracking platform
+              designed to streamline your job search process. It helps you
+              organize all your applications in one place, track their status,
+              and never miss important follow-ups.
             </p>
             <p>
-              With built-in AI assistance, you can optimize your resume and cover letters for each application, analyze skill gaps, and get personalized suggestions to improve your success rate.
+              With built-in AI assistance, you can optimize your resume and
+              cover letters for each application, analyze skill gaps, and get
+              personalized suggestions to improve your success rate.
             </p>
           </AccordionContent>
         </AccordionItem>
@@ -48,10 +53,15 @@ export function Faq() {
           </AccordionTrigger>
           <AccordionContent className="flex flex-col gap-3 text-gray-600 dark:text-gray-400">
             <p>
-              Yes, Appliquo is completely free to use. There are no hidden costs, subscription fees, or credit card requirements. You can track unlimited job applications and use the AI assistant without any charges.
+              Yes, Appliquo is completely free to use. There are no hidden
+              costs, subscription fees, or credit card requirements. You can
+              track unlimited job applications and use the AI assistant without
+              any charges.
             </p>
             <p>
-              Our mission is to make job searching easier and more organized for everyone, which is why we keep our core features free for all users.
+              Our mission is to make job searching easier and more organized for
+              everyone, which is why we keep our core features free for all
+              users.
             </p>
           </AccordionContent>
         </AccordionItem>
@@ -65,10 +75,16 @@ export function Faq() {
           </AccordionTrigger>
           <AccordionContent className="flex flex-col gap-3 text-gray-600 dark:text-gray-400">
             <p>
-              Our AI Assistant analyzes job descriptions and your resume to provide tailored suggestions. Simply paste the job description and your resume, and the AI will generate personalized improvements for your resume, create a customized cover letter, and identify any skill gaps.
+              Our AI Assistant analyzes job descriptions and your resume to
+              provide tailored suggestions. Simply paste the job description and
+              your resume, and the AI will generate personalized improvements
+              for your resume, create a customized cover letter, and identify
+              any skill gaps.
             </p>
             <p>
-              The AI uses advanced natural language processing to understand job requirements and match them with your qualifications, helping you present your best self to potential employers.
+              The AI uses advanced natural language processing to understand job
+              requirements and match them with your qualifications, helping you
+              present your best self to potential employers.
             </p>
           </AccordionContent>
         </AccordionItem>
@@ -82,10 +98,14 @@ export function Faq() {
           </AccordionTrigger>
           <AccordionContent className="flex flex-col gap-3 text-gray-600 dark:text-gray-400">
             <p>
-              Absolutely. Your privacy and data security are our top priorities. All your application data is stored locally in your browser, giving you complete control over your information.
+              Absolutely. Your privacy and data security are our top priorities.
+              All your application data is stored locally in your browser,
+              giving you complete control over your information.
             </p>
             <p>
-              We don't store your personal information, resumes, or application details on our servers. Your data stays on your device and is never shared with third parties.
+              We don't store your personal information, resumes, or application
+              details on our servers. Your data stays on your device and is
+              never shared with third parties.
             </p>
           </AccordionContent>
         </AccordionItem>
@@ -99,10 +119,14 @@ export function Faq() {
           </AccordionTrigger>
           <AccordionContent className="flex flex-col gap-3 text-gray-600 dark:text-gray-400">
             <p>
-              Currently, Appliquo stores data locally in your browser's storage. This means your applications are device-specific and won't automatically sync across multiple devices.
+              Currently, Appliquo stores data locally in your browser's storage.
+              This means your applications are device-specific and won't
+              automatically sync across multiple devices.
             </p>
             <p>
-              We're working on cloud sync features for future updates, which will allow you to access your applications from any device while maintaining the same level of security and privacy.
+              We're working on cloud sync features for future updates, which
+              will allow you to access your applications from any device while
+              maintaining the same level of security and privacy.
             </p>
           </AccordionContent>
         </AccordionItem>

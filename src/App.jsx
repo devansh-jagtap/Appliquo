@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import Assistant from "./pages/Assistant";
 import HeroSectionOne from "./components/hero-section-demo-1";
 import { Layout } from "lucide-react";
+import Auth from "./pages/Auth";
 
 function App() {
   const [applications, setApplications] = useState([]);
@@ -70,6 +71,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HeroSectionOne />} />
+        <Route path="/auth" element={<Auth />} />
         <Route
           path="/dashboard"
           element={
