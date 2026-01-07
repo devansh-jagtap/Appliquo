@@ -31,7 +31,7 @@ const ApplicationList = ({
               <div key={app.id} className="border rounded-lg p-4 space-y-3">
                 <div className="flex justify-between items-start gap-4">
                   <div className="flex-1">
-                    <h3 className="font-semibold text-lg">{app.companyName}</h3>
+                    <h3 className="font-semibold text-lg">{app.company}</h3>
                     <p className="text-muted-foreground">{app.role}</p>
                     <p className="text-sm text-muted-foreground mt-1">
                       Applied on: {app.date}

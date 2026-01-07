@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import ApplicationForm from "@/components/applicationForm";
 import ApplicationList from "@/components/applicationList";
 import Layout from "@/components/Layout";
@@ -8,13 +8,75 @@ import {
   HiCheckCircle,
   HiXCircle,
 } from "react-icons/hi2";
+import { supabase } from "@/lib/supabase";
 
-const Dashboard = ({
-  applications,
-  handleAddApplication,
-  handleUpdateStatus,
-  handleDeleteApplication,
-}) => {
+const Dashboard = () => {
+  const [applications, setApplications] = useState([]);
+
+  useEffect(() => {
+    const loadApplications = async () => {
+      const { data, error } = await supabase
+        .from("applications")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error(error);
+      } else {
+        setApplications(data);
+      }
+    };
+
+    loadApplications();
+  }, []);
+
+  const handleAddApplication = async (newApplication) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return;
+
+    const { error } = await supabase.from("applications").insert([
+      {
+        company: newApplication.companyName,
+        role: newApplication.role,
+        status: newApplication.status,
+        user_id: user.id,
+      },
+    ]);
+
+    if (!error) {
+      // reload jobs
+      const { data } = await supabase
+        .from("applications")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      setApplications(data);
+    }
+  };
+  const handleUpdateStatus = async (id, newStatus) => {
+    const { error } = await supabase
+      .from("applications")
+      .update({ status: newStatus })
+      .eq("id", id);
+
+    if (!error) {
+      setApplications((prev) =>
+        prev.map((app) => (app.id === id ? { ...app, status: newStatus } : app))
+      );
+    }
+  };
+
+  const handleDeleteApplication = async (id) => {
+    const { error } = await supabase.from("applications").delete().eq("id", id);
+
+    if (!error) {
+      setApplications((prev) => prev.filter((app) => app.id !== id));
+    }
+  };
+
   // Calculate stats
   const totalApplications = applications.length;
   const pendingApplications = applications.filter(

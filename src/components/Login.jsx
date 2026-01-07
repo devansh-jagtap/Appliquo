@@ -28,6 +28,10 @@ export function Login() {
       navigate("/dashboard");
     }
   };
+  const handleForgetPassword = async function (e) {
+    e.preventDefault();
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+  };
   return (
     <Card>
       <CardHeader>
@@ -56,6 +60,7 @@ export function Login() {
                 <a
                   href="#"
                   className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                  onClick={handleForgetPassword}
                 >
                   Forgot your password?
                 </a>

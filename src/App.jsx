@@ -9,40 +9,40 @@ import Auth from "./pages/Auth";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 function App() {
-  const [applications, setApplications] = useState([]);
-  const isInitialMount = useRef(true);
+  // const [applications, setApplications] = useState([]);
+  // const isInitialMount = useRef(true);
 
-  useEffect(() => {
-    const storedApplications = localStorage.getItem("applications");
+  // useEffect(() => {
+  //   const storedApplications = localStorage.getItem("applications");
 
-    if (storedApplications) {
-      setApplications(JSON.parse(storedApplications));
-    }
-  }, []);
+  //   if (storedApplications) {
+  //     setApplications(JSON.parse(storedApplications));
+  //   }
+  // }, []);
 
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-    localStorage.setItem("applications", JSON.stringify(applications));
-  }, [applications]);
+  // useEffect(() => {
+  // if (isInitialMount.current) {
+  //   isInitialMount.current = false;
+  //   return;
+  // }
+  // localStorage.setItem("applications", JSON.stringify(applications));
+  // }, [applications]);
 
-  const handleAddApplication = (newApplication) => {
-    setApplications([...applications, newApplication]);
-  };
+  // const handleAddApplication = (newApplication) => {
+  //   setApplications([...applications, newApplication]);
+  // };
 
-  const handleUpdateStatus = (id, newStatus) => {
-    setApplications(
-      applications.map((app) =>
-        app.id === id ? { ...app, status: newStatus } : app
-      )
-    );
-  };
+  // const handleUpdateStatus = (id, newStatus) => {
+  //   setApplications(
+  //     applications.map((app) =>
+  //       app.id === id ? { ...app, status: newStatus } : app
+  //     )
+  //   );
+  // };
 
-  const handleDeleteApplication = (id) => {
-    setApplications(applications.filter((app) => app.id !== id));
-  };
+  // const handleDeleteApplication = (id) => {
+  //   setApplications(applications.filter((app) => app.id !== id));
+  // };
 
   return (
     // <section className="min-h-screen bg-background py-8 px-4">
@@ -78,10 +78,10 @@ function App() {
           element={
             <ProtectedRoute>
               <Dashboard
-                applications={applications}
-                handleAddApplication={handleAddApplication}
-                handleUpdateStatus={handleUpdateStatus}
-                handleDeleteApplication={handleDeleteApplication}
+              // applications={applications}
+              // handleAddApplication={handleAddApplication}
+              // handleUpdateStatus={handleUpdateStatus}
+              // handleDeleteApplication={handleDeleteApplication}
               />
             </ProtectedRoute>
           }
