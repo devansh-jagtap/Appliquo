@@ -31,9 +31,15 @@ const Navbar = () => {
             </Link>
             <Link
               to="/assistant"
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+              className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
             >
               AI Assistant
+            </Link>
+            <Link
+              to="/auth"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            >
+              Login / SignUp
             </Link>
           </div>
         </div>

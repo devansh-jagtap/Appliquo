@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,11 +10,25 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { supabase } from "@/lib/supabase";
 
 export function Signup() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleSignup = async function (e) {
+    e.preventDefault();
+    const { error } = await supabase.auth.signUp({
+      name,
+      email,
+      password,
+    });
+    if (!error) {
+      navigate("/dashboard");
+    }
+  };
 
   return (
     <Card>
@@ -53,7 +68,9 @@ export function Signup() {
         </div>
       </CardContent>
       <CardFooter>
-        <Button>"Create Account"</Button>
+        <Button className="w-full" onClick={handleSignup}>
+          "Create Account"
+        </Button>
       </CardFooter>
     </Card>
   );

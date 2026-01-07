@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,12 +11,25 @@ import {
 } from "../components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { supabase } from "@/lib/supabase";
 
 export function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogin = async function (e) {
+    e.preventDefault();
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (!error) {
+      navigate("/dashboard");
+    }
+  };
   return (
-    <Card className="w-full max-w-sm">
+    <Card>
       <CardHeader>
         <CardTitle>Login to your account</CardTitle>
         <CardDescription>
@@ -58,7 +72,7 @@ export function Login() {
         </form>
       </CardContent>
       <CardFooter className="flex-col gap-2">
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="w-full" onClick={handleLogin}>
           Login
         </Button>
       </CardFooter>

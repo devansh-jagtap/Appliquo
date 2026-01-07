@@ -6,6 +6,7 @@ import Assistant from "./pages/Assistant";
 import HeroSectionOne from "./components/hero-section-demo-1";
 import { Layout } from "lucide-react";
 import Auth from "./pages/Auth";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 function App() {
   const [applications, setApplications] = useState([]);
@@ -75,15 +76,24 @@ function App() {
         <Route
           path="/dashboard"
           element={
-            <Dashboard
-              applications={applications}
-              handleAddApplication={handleAddApplication}
-              handleUpdateStatus={handleUpdateStatus}
-              handleDeleteApplication={handleDeleteApplication}
-            />
+            <ProtectedRoute>
+              <Dashboard
+                applications={applications}
+                handleAddApplication={handleAddApplication}
+                handleUpdateStatus={handleUpdateStatus}
+                handleDeleteApplication={handleDeleteApplication}
+              />
+            </ProtectedRoute>
           }
         />
-        <Route path="/assistant" element={<Assistant />} />
+        <Route
+          path="/assistant"
+          element={
+            <ProtectedRoute>
+              <Assistant />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
