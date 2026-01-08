@@ -1,16 +1,81 @@
-# React + Vite
+# Appliquo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**TrackEveryApplication. LandYourDreamJob.**
 
-Currently, two official plugins are available:
+Appliquo is a full-stack job application tracker with an AI Job Assistant that helps users manage job applications and quickly generate resume improvements, cover letters, and skill gap analysis using only a job description and resume text.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Job Tracking
+- Track and manage job applications
+- Monitor application status in one place
 
-## Expanding the ESLint configuration
+### AI Job Assistant
+Provide **Job Description + Resume (text)** to get:
+- Resume Improvement suggestions  
+- AI-generated Cover Letter  
+- Skill Gap Analysis  
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 🛠️ Tech Stack
+
+- React  
+- Tailwind CSS  
+- shadcn/ui  
+- Supabase  
+- Gemini AI  
+
+**Domain:** Full Stack Development
+
+---
+
+## 🌐 Live Demo
+
+https://appliquo.vercel.app/
+
+---
+
+## ⚙️ Setup
+
+```bash
+git clone <repository_url>
+cd Appliquo
+```
+### 2. Install Dependencies
+```bash
+npm install
+```
+This installs all required frontend libraries, UI components, Supabase client, and AI-related dependencies.
+
+### 3. Environment Variables Setup
+Create a .env file in the root directory and add the following:
+.env
+```bash
+VITE_GEMINI_API_KEY="your_gemini_api_key"
+VITE_SUPABASE_URL="your_supabase_project_url"
+VITE_SUPABASE_ANON_KEY="your_supabase_anon_key"
+```
+### Explanation:
+
+VITE_GEMINI_API_KEY
+Used for AI features such as resume improvement, cover letter generation, and skill gap analysis.
+
+VITE_SUPABASE_URL
+The URL of your Supabase project used for authentication and database operations.
+
+VITE_SUPABASE_ANON_KEY
+Public anonymous key required to connect the frontend with Supabase.
+
+Note: Since this project uses Vite, all environment variables must start with VITE_.
+
+### 4. Start the Development Server
+``` bash
+npm run dev
+```
+After running the command, open the browser and visit:
+```bash
+http://localhost:5173
+```
