@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Assistant from "./pages/Assistant";
+import Resume from "./pages/Resume";
 import HeroSectionOne from "./components/hero-section-demo-1";
 import { Layout } from "lucide-react";
 import Auth from "./pages/Auth";
@@ -91,6 +92,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Assistant />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/resumes"
+          element={
+            <ProtectedRoute>
+              <Resume />
             </ProtectedRoute>
           }
         />
