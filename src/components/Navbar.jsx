@@ -23,7 +23,7 @@ export default function Navbar({ user }) {
 
           {/* Navigation Links */}
           <div className="flex items-center space-x-4">
-            {user && (
+            {user ? (
               <>
                 <Link
                   to="/dashboard"
@@ -51,6 +51,12 @@ export default function Navbar({ user }) {
                   Logout
                 </Button>
               </>
+            ) : (
+              <Link to="/auth">
+                <Button className="bg-blue-600 hover:bg-blue-700">
+                  Login / Sign Up
+                </Button>
+              </Link>
             )}
           </div>
         </div>

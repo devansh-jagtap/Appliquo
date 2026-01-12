@@ -7,51 +7,12 @@ import {
   HiBriefcase,
 } from "react-icons/hi2";
 import { Faq } from "./faq";
+import Navbar from "./Navbar";
 
-const Navbar = () => {
-  return (
-    <nav className="relative z-50 border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center gap-2">
-            <HiBriefcase className="h-8 w-8 text-blue-600" />
-            <Link
-              to="/"
-              className="text-2xl font-bold text-gray-900 dark:text-white"
-            >
-              Appliquo
-            </Link>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link
-              to="/dashboard"
-              className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
-            >
-              Dashboard
-            </Link>
-            <Link
-              to="/assistant"
-              className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
-            >
-              AI Assistant
-            </Link>
-            <Link
-              to="/auth"
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-            >
-              Login / SignUp
-            </Link>
-          </div>
-        </div>
-      </div>
-    </nav>
-  );
-};
-
-export default function HeroSectionOne() {
+export default function HeroSectionOne({ user }) {
   return (
     <div className="relative w-full min-h-screen overflow-hidden bg-white dark:bg-gray-900">
-      <Navbar />
+      <Navbar user={user} />
       {/* Decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-blue-100 opacity-20 blur-3xl dark:bg-blue-900" />

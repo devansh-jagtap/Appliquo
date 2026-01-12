@@ -8,10 +8,28 @@ import HeroSectionOne from "./components/hero-section-demo-1";
 import { Layout } from "lucide-react";
 import Auth from "./pages/Auth";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { supabase } from "./lib/supabase";
 
 function App() {
+  const [user, setUser] = useState(null);
   // const [applications, setApplications] = useState([]);
   // const isInitialMount = useRef(true);
+
+  useEffect(() => {
+    // Get current user
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   // useEffect(() => {
   //   const storedApplications = localStorage.getItem("applications");
@@ -72,7 +90,7 @@ function App() {
     // </section>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<HeroSectionOne />} />
+        <Route path="/" element={<HeroSectionOne user={user} />} />
         <Route path="/auth" element={<Auth />} />
         <Route
           path="/dashboard"
