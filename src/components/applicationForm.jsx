@@ -36,7 +36,7 @@ const ApplicationForm = ({ onAddApplication }) => {
       <CardHeader>
         <CardTitle>Add Application</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-2">
         <div className="space-y-2">
           <Label htmlFor="company">Company Name</Label>
           <Input
@@ -72,9 +72,7 @@ const ApplicationForm = ({ onAddApplication }) => {
           </Select>
         </div>
 
-        <Button onClick={handleSubmit} className="w-full">
-          Add Application
-        </Button>
+        <Button onClick={handleSubmit}>Add Application</Button>
       </CardContent>
     </Card>
   );

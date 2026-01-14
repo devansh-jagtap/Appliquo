@@ -167,18 +167,19 @@ const Dashboard = () => {
             );
           })}
         </div>
+        <div className="grid grid-cols-2 gap-5">
+          {/* Application Form */}
+          <div className="mb-8">
+            <ApplicationForm onAddApplication={handleAddApplication} />
+          </div>
 
-        {/* Application Form */}
-        <div className="mb-8">
-          <ApplicationForm onAddApplication={handleAddApplication} />
+          {/* Applications List */}
+          <ApplicationList
+            applications={applications}
+            onUpdateStatus={handleUpdateStatus}
+            onDeleteApplication={handleDeleteApplication}
+          />
         </div>
-
-        {/* Applications List */}
-        <ApplicationList
-          applications={applications}
-          onUpdateStatus={handleUpdateStatus}
-          onDeleteApplication={handleDeleteApplication}
-        />
       </div>
     </Layout>
   );

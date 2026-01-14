@@ -3,10 +3,18 @@ import { supabase } from "../lib/supabase";
 import Layout from "../components/Layout";
 import ResumeUpload from "../components/ResumeUpload";
 import ResumeList from "../components/ResumeList";
+import ResumeViewer from "../components/ResumeViewer";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 
 export default function Resume() {
   const [resumes, setResumes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedResume, setSelectedResume] = useState(null);
 
   const fetchResumes = async () => {
     try {
@@ -42,6 +50,11 @@ export default function Resume() {
 
   const handleResumeDeleted = () => {
     fetchResumes();
+    setSelectedResume(null);
+  };
+
+  const handleResumeView = (resume) => {
+    setSelectedResume(resume);
   };
 
   return (
@@ -66,9 +79,24 @@ export default function Resume() {
               resumes={resumes}
               loading={loading}
               onResumeDeleted={handleResumeDeleted}
+              onResumeView={handleResumeView}
             />
           </div>
         </div>
+
+        {/* Resume Viewer Section */}
+        {selectedResume && (
+          <div className="mt-8">
+            <Card>
+              <CardHeader>
+                <CardTitle>Resume Preview</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResumeViewer resume={selectedResume} />
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
     </Layout>
   );

@@ -26,7 +26,7 @@ const ApplicationList = ({
             No applications yet
           </p>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 grid grid-cols-1 gap-5">
             {applications.map((app) => (
               <div key={app.id} className="border rounded-lg p-4 space-y-3">
                 <div className="flex justify-between items-start gap-4">
