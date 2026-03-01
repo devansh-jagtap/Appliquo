@@ -27,7 +27,9 @@ export function Login() {
       password,
     });
     if (error) {
-      setErrorMessage(error.message || "Invalid email or password. Please try again.");
+      setErrorMessage(
+        error.message || "Invalid email or password. Please try again.",
+      );
       return;
     }
     navigate("/dashboard");
