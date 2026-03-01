@@ -93,8 +93,8 @@ export default function ResumeUpload({ onResumeUploaded }) {
           .upload(fileName, file);
 
         if (uploadError) throw uploadError;
-        resumeContent = `PDF:${fileName}`; 
-        atsScore = 75; 
+        resumeContent = `PDF:${fileName}`;
+        atsScore = 75;
       } else {
         // Text resume
         resumeContent = content.trim();
