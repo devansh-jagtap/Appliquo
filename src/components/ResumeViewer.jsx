@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { supabase } from "../lib/supabase";
 import "react-pdf/dist/Page/AnnotationLayer.css";
@@ -13,50 +13,88 @@ export default function ResumeViewer({ resume }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Check if content is a PDF (either new format "PDF:path" or old URL format)
+  const isPdfContent =
+    resume?.content &&
+    (resume.content.startsWith("PDF:") ||
+      resume.content.includes("/resumes/") ||
+      (resume.content.startsWith("http") && resume.content.includes(".pdf")));
+
   useEffect(() => {
     const loadPdf = async () => {
-      if (resume?.file_type === "pdf" && resume?.file_path) {
-        try {
-          setLoading(true);
-          setError(null);
+      if (!isPdfContent && !resume?.file_path) return;
 
-          const { data, error: urlError } = await supabase.storage
-            .from("resumes")
-            .createSignedUrl(resume.file_path, 3600);
+      try {
+        setLoading(true);
+        setError(null);
 
-          if (urlError) {
-            console.error("Signed URL error:", urlError);
-            throw urlError;
-          }
+        let filePath = null;
 
-          if (!data?.signedUrl) {
-            throw new Error("No signed URL returned");
-          }
-
-          console.log("PDF URL loaded:", data.signedUrl);
-          setUrl(data.signedUrl);
-        } catch (err) {
-          console.error("Error loading PDF:", err);
-          setError(`Failed to load PDF: ${err.message}`);
-        } finally {
-          setLoading(false);
+        // New format: "PDF:filepath"
+        if (resume.content?.startsWith("PDF:")) {
+          filePath = resume.content.substring(4); // Remove "PDF:" prefix
         }
+        // Old format: file_path field
+        else if (resume.file_path) {
+          filePath = resume.file_path;
+        }
+        // Legacy: old public URL format (try to extract path)
+        else if (resume.content?.includes("/resumes/")) {
+          const match = resume.content.match(/\/resumes\/(.+)$/);
+          if (match) {
+            filePath = match[1];
+          }
+        }
+
+        if (!filePath) {
+          throw new Error("Could not determine file path");
+        }
+
+        // Generate signed URL (valid for 1 hour)
+        const { data, error: urlError } = await supabase.storage
+          .from("resumes")
+          .createSignedUrl(filePath, 3600);
+
+        if (urlError) {
+          throw urlError;
+        }
+
+        if (!data?.signedUrl) {
+          throw new Error("No signed URL returned");
+        }
+
+        setUrl(data.signedUrl);
+      } catch (err) {
+        setError(`Failed to load PDF: ${err.message}`);
+      } finally {
+        setLoading(false);
       }
     };
 
     loadPdf();
-  }, [resume]);
+  }, [resume, isPdfContent]);
+
+  // Memoize file prop to prevent unnecessary reloads
+  const fileOptions = useMemo(() => ({ url }), [url]);
+
+  // Memoize options prop to prevent unnecessary reloads
+  const documentOptions = useMemo(
+    () => ({
+      cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
+      cMapPacked: true,
+      standardFontDataUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/standard_fonts/`,
+    }),
+    [],
+  );
 
   const onDocumentLoadSuccess = ({ numPages }) => {
-    console.log("PDF loaded successfully, pages:", numPages);
     setNumPages(numPages);
     setError(null);
   };
 
   const onDocumentLoadError = (error) => {
-    console.error("PDF document load error:", error);
     setError(
-      `Failed to load PDF document: ${error.message || "Unknown error"}`
+      `Failed to load PDF document: ${error.message || "Unknown error"}`,
     );
   };
 
@@ -68,20 +106,8 @@ export default function ResumeViewer({ resume }) {
     );
   }
 
-  // Text resume
-  if (resume.file_type === "text") {
-    return (
-      <div className="bg-white p-6 rounded-lg border">
-        <h2 className="text-xl font-bold mb-4">{resume.title}</h2>
-        <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed">
-          {resume.content}
-        </pre>
-      </div>
-    );
-  }
-
-  // PDF resume
-  if (resume.file_type === "pdf") {
+  // PDF resume (check if content indicates PDF)
+  if (isPdfContent || resume.file_type === "pdf") {
     if (loading) {
       return (
         <div className="flex items-center justify-center h-64">
@@ -103,9 +129,9 @@ export default function ResumeViewer({ resume }) {
     }
 
     return (
-      <div className="bg-white rounded-lg border">
-        <div className="p-4 border-b">
-          <h2 className="text-xl font-bold">{resume.title}</h2>
+      <div className="bg-white dark:bg-gray-900 rounded-lg border dark:border-gray-700">
+        <div className="p-4 border-b dark:border-gray-700">
+          <h2 className="text-xl font-bold dark:text-white">{resume.title}</h2>
           {numPages && (
             <p className="text-sm text-gray-600 mt-1">
               {numPages} page{numPages !== 1 ? "s" : ""}
@@ -114,14 +140,10 @@ export default function ResumeViewer({ resume }) {
         </div>
         <div className="max-h-[600px] overflow-auto p-4">
           <Document
-            file={{ url }}
+            file={fileOptions}
             onLoadSuccess={onDocumentLoadSuccess}
             onLoadError={onDocumentLoadError}
-            options={{
-              cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
-              cMapPacked: true,
-              standardFontDataUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/standard_fonts/`,
-            }}
+            options={documentOptions}
             loading={
               <div className="flex items-center justify-center h-64">
                 <p className="text-gray-500">Loading document...</p>
@@ -140,6 +162,20 @@ export default function ResumeViewer({ resume }) {
             ))}
           </Document>
         </div>
+      </div>
+    );
+  }
+
+  // Text resume (content is plain text, not a PDF)
+  if (resume.content && !isPdfContent) {
+    return (
+      <div className="bg-white dark:bg-gray-900 p-6 rounded-lg border dark:border-gray-700">
+        <h2 className="text-xl font-bold mb-4 dark:text-white">
+          {resume.title}
+        </h2>
+        <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed dark:text-gray-200">
+          {resume.content}
+        </pre>
       </div>
     );
   }

@@ -64,7 +64,9 @@ const Dashboard = () => {
 
     if (!error) {
       setApplications((prev) =>
-        prev.map((app) => (app.id === id ? { ...app, status: newStatus } : app))
+        prev.map((app) =>
+          app.id === id ? { ...app, status: newStatus } : app,
+        ),
       );
     }
   };
@@ -80,13 +82,13 @@ const Dashboard = () => {
   // Calculate stats
   const totalApplications = applications.length;
   const pendingApplications = applications.filter(
-    (app) => app.status === "Applied" || app.status === "In Progress"
+    (app) => app.status === "Applied" || app.status === "In Progress",
   ).length;
   const acceptedApplications = applications.filter(
-    (app) => app.status === "Accepted" || app.status === "Offer"
+    (app) => app.status === "Accepted" || app.status === "Offer",
   ).length;
   const rejectedApplications = applications.filter(
-    (app) => app.status === "Rejected"
+    (app) => app.status === "Rejected",
   ).length;
 
   const stats = [
@@ -121,10 +123,8 @@ const Dashboard = () => {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Dashboard
-          </h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
+          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+          <p className="mt-2 text-muted-foreground">
             Track and manage your job applications
           </p>
         </div>
@@ -136,29 +136,27 @@ const Dashboard = () => {
             return (
               <div
                 key={index}
-                className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900"
+                className="rounded-xl border border-border bg-card p-6 shadow-sm"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                    <p className="text-sm font-medium text-muted-foreground">
                       {stat.title}
                     </p>
-                    <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
+                    <p className="mt-2 text-3xl font-bold text-card-foreground">
                       {stat.value}
                     </p>
                   </div>
                   <div
                     className={`flex h-12 w-12 items-center justify-center rounded-lg ${
-                      stat.color === "blue"
-                        ? "bg-blue-100 dark:bg-blue-900/30"
-                        : "bg-gray-100 dark:bg-gray-800"
+                      stat.color === "blue" ? "bg-primary/10" : "bg-muted"
                     }`}
                   >
                     <Icon
                       className={`h-6 w-6 ${
                         stat.color === "blue"
-                          ? "text-blue-600"
-                          : "text-gray-600 dark:text-gray-400"
+                          ? "text-primary"
+                          : "text-muted-foreground"
                       }`}
                     />
                   </div>

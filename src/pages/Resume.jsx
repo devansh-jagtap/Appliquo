@@ -3,18 +3,10 @@ import { supabase } from "../lib/supabase";
 import Layout from "../components/Layout";
 import ResumeUpload from "../components/ResumeUpload";
 import ResumeList from "../components/ResumeList";
-import ResumeViewer from "../components/ResumeViewer";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
 
 export default function Resume() {
   const [resumes, setResumes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedResume, setSelectedResume] = useState(null);
 
   const fetchResumes = async () => {
     try {
@@ -50,19 +42,14 @@ export default function Resume() {
 
   const handleResumeDeleted = () => {
     fetchResumes();
-    setSelectedResume(null);
-  };
-
-  const handleResumeView = (resume) => {
-    setSelectedResume(resume);
   };
 
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Resumes</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-3xl font-bold text-foreground">My Resumes</h1>
+          <p className="mt-2 text-muted-foreground">
             Upload and manage your resumes for job applications
           </p>
         </div>
@@ -79,24 +66,9 @@ export default function Resume() {
               resumes={resumes}
               loading={loading}
               onResumeDeleted={handleResumeDeleted}
-              onResumeView={handleResumeView}
             />
           </div>
         </div>
-
-        {/* Resume Viewer Section */}
-        {selectedResume && (
-          <div className="mt-8">
-            <Card>
-              <CardHeader>
-                <CardTitle>Resume Preview</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResumeViewer resume={selectedResume} />
-              </CardContent>
-            </Card>
-          </div>
-        )}
       </div>
     </Layout>
   );

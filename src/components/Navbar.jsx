@@ -1,66 +1,150 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
-import { Button } from "./ui/button";
+import {
+  Navbar as ResizableNavbar,
+  NavBody,
+  MobileNav,
+  MobileNavHeader,
+  MobileNavToggle,
+  MobileNavMenu,
+  NavbarButton,
+} from "./ui/resizable-navbar";
 
 export default function Navbar({ user }) {
   const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/auth");
   };
 
+  const navItems = user
+    ? [
+        { name: "Dashboard", to: "/dashboard" },
+        { name: "Assistant", to: "/assistant" },
+        { name: "Resumes", to: "/resumes" },
+      ]
+    : [];
+
   return (
-    <nav className="bg-white shadow-sm border-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* App Name */}
-          <div className="flex-shrink-0">
-            <Link to="/" className="text-2xl font-bold text-blue-600">
+    <div className="relative w-full">
+      <ResizableNavbar>
+        {/* Desktop navigation */}
+        <NavBody>
+          {/* Brand */}
+          <Link
+            to="/"
+            className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal"
+          >
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground shadow-lg">
+              AQ
+            </span>
+            <span className="text-base font-semibold text-foreground">
               Appliquo
-            </Link>
+            </span>
+          </Link>
+
+          {/* Center nav items (desktop) */}
+          <div className="absolute inset-0 hidden flex-1 items-center justify-center gap-1 text-sm font-medium lg:flex">
+            {user &&
+              navItems.map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className="relative rounded-full px-4 py-2 text-foreground transition-colors duration-200 hover:bg-accent hover:text-accent-foreground"
+                >
+                  {item.name}
+                </Link>
+              ))}
           </div>
 
-          {/* Navigation Links */}
-          <div className="flex items-center space-x-4">
+          {/* Right actions (desktop) */}
+          <div className="ml-auto flex items-center gap-3">
             {user ? (
-              <>
-                <Link
-                  to="/dashboard"
-                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  to="/assistant"
-                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition"
-                >
-                  Assistant
-                </Link>
-                <Link
-                  to="/resumes"
-                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition"
-                >
-                  Resumes
-                </Link>
-                <Button
-                  onClick={handleLogout}
-                  variant="outline"
-                  className="ml-4"
-                >
-                  Logout
-                </Button>
-              </>
+              <NavbarButton
+                as="button"
+                type="button"
+                variant="secondary"
+                onClick={handleLogout}
+              >
+                Logout
+              </NavbarButton>
             ) : (
-              <Link to="/auth">
-                <Button className="bg-blue-600 hover:bg-blue-700">
-                  Login / Sign Up
-                </Button>
-              </Link>
+              <NavbarButton as={Link} to="/auth" variant="primary">
+                Login / Sign Up
+              </NavbarButton>
             )}
           </div>
-        </div>
-      </div>
-    </nav>
+        </NavBody>
+
+        {/* Mobile navigation */}
+        <MobileNav>
+          <MobileNavHeader>
+            <Link
+              to="/"
+              className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal"
+            >
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground shadow-lg">
+                AQ
+              </span>
+              <span className="text-base font-semibold text-foreground">
+                Appliquo
+              </span>
+            </Link>
+
+            <MobileNavToggle
+              isOpen={isMobileMenuOpen}
+              onClick={() => setIsMobileMenuOpen((open) => !open)}
+            />
+          </MobileNavHeader>
+
+          <MobileNavMenu
+            isOpen={isMobileMenuOpen}
+            onClose={() => setIsMobileMenuOpen(false)}
+          >
+            {user &&
+              navItems.map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block rounded-md px-2 py-2 text-base text-foreground transition-colors duration-200 hover:bg-accent hover:text-accent-foreground"
+                >
+                  {item.name}
+                </Link>
+              ))}
+
+            <div className="mt-4 flex w-full flex-col gap-3">
+              {user ? (
+                <NavbarButton
+                  as="button"
+                  type="button"
+                  variant="primary"
+                  className="w-full"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleLogout();
+                  }}
+                >
+                  Logout
+                </NavbarButton>
+              ) : (
+                <NavbarButton
+                  as={Link}
+                  to="/auth"
+                  variant="primary"
+                  className="w-full"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Login / Sign Up
+                </NavbarButton>
+              )}
+            </div>
+          </MobileNavMenu>
+        </MobileNav>
+      </ResizableNavbar>
+    </div>
   );
 }

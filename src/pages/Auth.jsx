@@ -3,10 +3,13 @@ import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Login } from "@/components/Login";
 import { Signup } from "@/components/Signup";
+import ThemeToggle from "@/components/ThemeToggle";
+
 const Auth = () => {
   const [searchParams] = useSearchParams();
   return (
     <div className="mt-36 flex flex-col items-center gap-10">
+      <ThemeToggle />
       <h1 className="text-5xl font-extrabold">
         {searchParams.get("createNew")
           ? "Hold up! Let's login first..."

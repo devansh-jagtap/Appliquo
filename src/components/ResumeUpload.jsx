@@ -5,7 +5,7 @@ import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Upload } from "lucide-react";
 
 // ATS Score calculation helper
 const calculateATSScore = (text) => {
@@ -31,17 +31,42 @@ const calculateATSScore = (text) => {
 };
 
 export default function ResumeUpload({ onResumeUploaded }) {
+  const [uploadType, setUploadType] = useState("text"); // "text" or "pdf"
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [pdfFile, setPdfFile] = useState(null);
+  const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [uploadMode, setUploadMode] = useState("text");
 
-  const handleTextSubmit = async (e) => {
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile && selectedFile.type === "application/pdf") {
+      setFile(selectedFile);
+      // Auto-fill title from filename if empty
+      if (!title) {
+        setTitle(selectedFile.name.replace(".pdf", ""));
+      }
+    } else {
+      alert("Please select a PDF file");
+      e.target.value = null;
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!title.trim() || !content.trim()) {
-      alert("Please provide both title and resume content");
+    // Validation based on upload type
+    if (!title.trim()) {
+      alert("Please provide a resume title");
+      return;
+    }
+
+    if (uploadType === "text" && !content.trim()) {
+      alert("Please provide resume content");
+      return;
+    }
+
+    if (uploadType === "pdf" && !file) {
+      alert("Please select a PDF file");
       return;
     }
 
@@ -57,16 +82,32 @@ export default function ResumeUpload({ onResumeUploaded }) {
       if (userError) throw userError;
       if (!user) throw new Error("No user logged in");
 
-      // Calculate ATS score
-      const atsScore = calculateATSScore(content);
+      let resumeContent = "";
+      let atsScore = 0;
+
+      if (uploadType === "pdf") {
+        // Upload PDF to storage
+        const fileName = `${user.id}/${Date.now()}_${file.name}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("resumes")
+          .upload(fileName, file);
+
+        if (uploadError) throw uploadError;
+
+        // Store the file path (not public URL) - we'll generate signed URLs when viewing
+        resumeContent = `PDF:${fileName}`; // Prefix to indicate it's a PDF file path
+        atsScore = 75; // Default score for PDF uploads
+      } else {
+        // Text resume
+        resumeContent = content.trim();
+        atsScore = calculateATSScore(content);
+      }
 
       // Insert into resumes table
       const { error: insertError } = await supabase.from("resumes").insert({
         user_id: user.id,
         title: title.trim(),
-        content: content.trim(),
-        file_type: "text",
-        file_path: null,
+        content: resumeContent,
         ats_score: atsScore,
       });
 
@@ -75,6 +116,10 @@ export default function ResumeUpload({ onResumeUploaded }) {
       // Clear form
       setTitle("");
       setContent("");
+      setFile(null);
+      if (document.getElementById("file-upload")) {
+        document.getElementById("file-upload").value = null;
+      }
 
       // Notify parent to refresh list
       if (onResumeUploaded) {
@@ -90,159 +135,112 @@ export default function ResumeUpload({ onResumeUploaded }) {
     }
   };
 
-  const handlePdfSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!pdfFile) {
-      alert("Please select a PDF file");
-      return;
-    }
-
-    if (pdfFile.type !== "application/pdf") {
-      alert("Only PDF files are allowed");
-      return;
-    }
-
-    try {
-      setUploading(true);
-
-      // Get logged-in user
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-
-      if (userError) throw userError;
-      if (!user) throw new Error("No user logged in");
-
-      // Generate unique ID for the resume
-      const resumeId = crypto.randomUUID();
-      const filePath = `${user.id}/${resumeId}.pdf`;
-
-      // 1. Upload PDF to storage
-      const { error: uploadError } = await supabase.storage
-        .from("resumes")
-        .upload(filePath, pdfFile);
-
-      if (uploadError) throw uploadError;
-
-      // 2. Insert metadata into resumes table
-      const { error: dbError } = await supabase.from("resumes").insert({
-        id: resumeId,
-        user_id: user.id,
-        title: title.trim() || pdfFile.name,
-        file_type: "pdf",
-        file_path: filePath,
-        content: null,
-        ats_score: null,
-      });
-
-      if (dbError) throw dbError;
-
-      // Clear form
-      setTitle("");
-      setPdfFile(null);
-      e.target.reset();
-
-      // Notify parent to refresh list
-      if (onResumeUploaded) {
-        onResumeUploaded();
-      }
-
-      alert("PDF Resume uploaded successfully!");
-    } catch (error) {
-      console.error("Error uploading PDF:", error);
-      alert("Failed to upload PDF: " + error.message);
-    } finally {
-      setUploading(false);
-    }
-  };
-
   return (
     <Card>
       <CardHeader>
         <CardTitle>Upload Resume</CardTitle>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="text" onValueChange={setUploadMode}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="text">Text Resume</TabsTrigger>
-            <TabsTrigger value="pdf">PDF Resume</TabsTrigger>
-          </TabsList>
+        {/* Tab Selector */}
+        <div className="flex gap-2 mb-6 p-1 bg-muted rounded-lg">
+          <button
+            type="button"
+            onClick={() => setUploadType("text")}
+            className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              uploadType === "text"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Text Resume
+          </button>
+          <button
+            type="button"
+            onClick={() => setUploadType("pdf")}
+            className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              uploadType === "pdf"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            PDF Resume
+          </button>
+        </div>
 
-          <TabsContent value="text">
-            <form onSubmit={handleTextSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="text-title">Resume Title</Label>
-                <Input
-                  id="text-title"
-                  type="text"
-                  placeholder="e.g., Software Engineer Resume"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  disabled={uploading}
-                  required
-                />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="title">Resume Title</Label>
+            <Input
+              id="title"
+              type="text"
+              placeholder="e.g., Software Engineer Resume"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              disabled={uploading}
+              required
+            />
+          </div>
+
+          {uploadType === "text" ? (
+            <div>
+              <Label htmlFor="content">Resume Content</Label>
+              <Textarea
+                id="content"
+                placeholder="Paste your resume text here..."
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                disabled={uploading}
+                rows={12}
+                required
+                className="font-mono text-sm"
+              />
+            </div>
+          ) : (
+            <div>
+              <Label htmlFor="file-upload">PDF File</Label>
+              <div className="mt-2">
+                <label
+                  htmlFor="file-upload"
+                  className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-card hover:bg-accent/50 border-border transition-colors"
+                >
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <Upload className="w-8 h-8 mb-2 text-muted-foreground" />
+                    <p className="mb-2 text-sm text-muted-foreground">
+                      {file ? (
+                        <span className="font-semibold text-foreground">
+                          {file.name}
+                        </span>
+                      ) : (
+                        <>
+                          <span className="font-semibold">Click to upload</span>{" "}
+                          or drag and drop
+                        </>
+                      )}
+                    </p>
+                    <p className="text-xs text-muted-foreground">PDF only</p>
+                  </div>
+                  <input
+                    id="file-upload"
+                    type="file"
+                    accept=".pdf,application/pdf"
+                    onChange={handleFileChange}
+                    disabled={uploading}
+                    className="hidden"
+                    required={uploadType === "pdf"}
+                  />
+                </label>
               </div>
+            </div>
+          )}
 
-              <div>
-                <Label htmlFor="content">Resume Content</Label>
-                <Textarea
-                  id="content"
-                  placeholder="Paste your resume text here..."
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  disabled={uploading}
-                  rows={12}
-                  required
-                  className="font-mono text-sm"
-                />
-              </div>
-
-              <Button type="submit" disabled={uploading} className="w-full">
-                {uploading ? "Uploading..." : "Upload Text Resume"}
-              </Button>
-            </form>
-          </TabsContent>
-
-          <TabsContent value="pdf">
-            <form onSubmit={handlePdfSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="pdf-title">Resume Title (Optional)</Label>
-                <Input
-                  id="pdf-title"
-                  type="text"
-                  placeholder="Leave blank to use filename"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  disabled={uploading}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="pdf-file">PDF File</Label>
-                <Input
-                  id="pdf-file"
-                  type="file"
-                  accept=".pdf,application/pdf"
-                  onChange={(e) => setPdfFile(e.target.files?.[0] || null)}
-                  disabled={uploading}
-                  required
-                  className="cursor-pointer"
-                />
-                {pdfFile && (
-                  <p className="text-sm text-gray-600 mt-2">
-                    Selected: {pdfFile.name}
-                  </p>
-                )}
-              </div>
-
-              <Button type="submit" disabled={uploading} className="w-full">
-                {uploading ? "Uploading..." : "Upload PDF Resume"}
-              </Button>
-            </form>
-          </TabsContent>
-        </Tabs>
+          <Button type="submit" disabled={uploading} className="w-full">
+            {uploading
+              ? "Uploading..."
+              : uploadType === "text"
+                ? "Upload Text Resume"
+                : "Upload PDF Resume"}
+          </Button>
+        </form>
       </CardContent>
     </Card>
   );

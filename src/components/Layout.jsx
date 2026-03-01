@@ -1,7 +1,9 @@
 import { HiBriefcase } from "react-icons/hi2";
 import Navbar from "./Navbar";
+import ThemeToggle from "./ThemeToggle";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
+import Footer from "./Footer";
 
 const Layout = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -23,29 +25,18 @@ const Layout = ({ children }) => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen mt-10">
       {/* Navigation */}
       <Navbar user={user} />
+
+      {/* Theme Toggle - Fixed Bottom Left */}
+      <ThemeToggle />
 
       {/* Main Content */}
       <main>{children}</main>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 bg-white py-8 dark:border-gray-800 dark:bg-gray-900">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <div className="flex items-center gap-2">
-              <HiBriefcase className="h-6 w-6 text-blue-600" />
-              <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                Appliquo
-              </span>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              © 2024 Appliquo. AI-powered job application tracking.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

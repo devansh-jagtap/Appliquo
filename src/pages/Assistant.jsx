@@ -73,7 +73,7 @@ const Assistant = () => {
               },
             ],
           }),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -109,14 +109,14 @@ const Assistant = () => {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
-              <HiSparkles className="h-7 w-7 text-blue-600" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+              <HiSparkles className="h-7 w-7 text-primary" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-3xl font-bold text-foreground">
                 AI Job Assistant
               </h1>
-              <p className="mt-1 text-gray-600 dark:text-gray-400">
+              <p className="mt-1 text-muted-foreground">
                 Get AI-powered suggestions to improve your applications
               </p>
             </div>
@@ -127,10 +127,10 @@ const Assistant = () => {
           {/* Left Column - Input */}
           <div className="space-y-6">
             {/* Job Description */}
-            <Card className="border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+            <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
-                  <HiBriefcase className="h-5 w-5 text-blue-600" />
+                <CardTitle className="flex items-center gap-2">
+                  <HiBriefcase className="h-5 w-5 text-primary" />
                   Job Description
                 </CardTitle>
               </CardHeader>
@@ -140,16 +140,15 @@ const Assistant = () => {
                   placeholder="Paste the job description here..."
                   value={jobDescription}
                   onChange={(e) => setJobDescription(e.target.value)}
-                  className="border-gray-200 bg-white text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                 />
               </CardContent>
             </Card>
 
             {/* Resume */}
-            <Card className="border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+            <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
-                  <HiDocumentText className="h-5 w-5 text-blue-600" />
+                <CardTitle className="flex items-center gap-2">
+                  <HiDocumentText className="h-5 w-5 text-primary" />
                   Your Resume
                 </CardTitle>
               </CardHeader>
@@ -159,14 +158,13 @@ const Assistant = () => {
                   placeholder="Paste your resume text here..."
                   value={resumeText}
                   onChange={(e) => setResumeText(e.target.value)}
-                  className="border-gray-200 bg-white text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                 />
               </CardContent>
             </Card>
 
             {/* Generate Button */}
             <Button
-              className="w-full bg-blue-600 text-white hover:bg-blue-700"
+              className="w-full"
               onClick={handleGenerator}
               disabled={isLoading}
             >
@@ -178,20 +176,20 @@ const Assistant = () => {
           {/* Right Column - Results */}
           <div className="space-y-6">
             {/* Resume Improvements */}
-            <Card className="border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+            <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
-                  <HiDocumentText className="h-5 w-5 text-blue-600" />
+                <CardTitle className="flex items-center gap-2">
+                  <HiDocumentText className="h-5 w-5 text-primary" />
                   Resume Improvements
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {!result ? (
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-muted-foreground">
                     Resume improvements will appear here after generation.
                   </p>
                 ) : (
-                  <p className="whitespace-pre-line text-sm text-gray-700 dark:text-gray-300">
+                  <p className="whitespace-pre-line text-sm text-card-foreground">
                     {result.resume}
                   </p>
                 )}
@@ -199,20 +197,20 @@ const Assistant = () => {
             </Card>
 
             {/* Cover Letter */}
-            <Card className="border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+            <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
-                  <HiPencil className="h-5 w-5 text-blue-600" />
+                <CardTitle className="flex items-center gap-2">
+                  <HiPencil className="h-5 w-5 text-primary" />
                   Cover Letter Draft
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {!result ? (
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-muted-foreground">
                     A tailored cover letter will appear here after generation.
                   </p>
                 ) : (
-                  <p className="whitespace-pre-line text-sm text-gray-700 dark:text-gray-300">
+                  <p className="whitespace-pre-line text-sm text-card-foreground">
                     {result.coverLetter}
                   </p>
                 )}
@@ -220,20 +218,20 @@ const Assistant = () => {
             </Card>
 
             {/* Skill Gap Analysis */}
-            <Card className="border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+            <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
-                  <HiChartBar className="h-5 w-5 text-blue-600" />
+                <CardTitle className="flex items-center gap-2">
+                  <HiChartBar className="h-5 w-5 text-primary" />
                   Skill Gap Analysis
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {!result ? (
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-muted-foreground">
                     Missing skills analysis will appear here after generation.
                   </p>
                 ) : (
-                  <p className="whitespace-pre-line text-sm text-gray-700 dark:text-gray-300">
+                  <p className="whitespace-pre-line text-sm text-card-foreground">
                     {result.skills}
                   </p>
                 )}

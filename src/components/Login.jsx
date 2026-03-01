@@ -16,17 +16,21 @@ import { supabase } from "@/lib/supabase";
 export function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async function (e) {
     e.preventDefault();
+    setErrorMessage("");
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    if (!error) {
-      navigate("/dashboard");
+    if (error) {
+      setErrorMessage(error.message || "Invalid email or password. Please try again.");
+      return;
     }
+    navigate("/dashboard");
   };
   const handleForgetPassword = async function (e) {
     e.preventDefault();
@@ -43,6 +47,14 @@ export function Login() {
       <CardContent>
         <form>
           <div className="flex flex-col gap-6">
+            {errorMessage && (
+              <div
+                role="alert"
+                className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-800 dark:bg-red-950/50 dark:text-red-200"
+              >
+                {errorMessage}
+              </div>
+            )}
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
