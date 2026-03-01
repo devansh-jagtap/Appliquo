@@ -2,7 +2,7 @@ import { HiBriefcase } from "react-icons/hi2";
 import Navbar from "./Navbar";
 import ThemeToggle from "./ThemeToggle";
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { supabase } from "../../lib/supabase";
 import Footer from "./Footer";
 
 const Layout = ({ children }) => {

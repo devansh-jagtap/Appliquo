@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { supabase } from "../lib/supabase";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { supabase } from "../../lib/supabase";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { HiTrash, HiDocumentText, HiEye } from "react-icons/hi2";
 import ResumeViewer from "./ResumeViewer";
 

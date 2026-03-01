@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
-import Layout from "../components/Layout";
-import ResumeUpload from "../components/ResumeUpload";
-import ResumeList from "../components/ResumeList";
+import Layout from "../components/layout/Layout";
+import ResumeUpload from "../components/resume/ResumeUpload";
+import ResumeList from "../components/resume/ResumeList";
 
 export default function Resume() {
   const [resumes, setResumes] = useState([]);

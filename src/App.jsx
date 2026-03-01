@@ -3,10 +3,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Assistant from "./pages/Assistant";
 import Resume from "./pages/Resume";
-import HeroSection from "./components/hero-section-5";
+import HeroSection from "./components/landing/HeroSection";
 import { Layout } from "lucide-react";
 import Auth from "./pages/Auth";
-import { ProtectedRoute } from "./components/ProtectedRoute";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 
 function App() {
   // const [applications, setApplications] = useState([]);

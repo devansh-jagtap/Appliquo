@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { supabase } from "../lib/supabase";
+import { supabase } from "../../lib/supabase";
 import {
   Navbar as ResizableNavbar,
   NavBody,
@@ -9,7 +9,7 @@ import {
   MobileNavToggle,
   MobileNavMenu,
   NavbarButton,
-} from "./ui/resizable-navbar";
+} from "../ui/resizable-navbar";
 
 export default function Navbar({ user }) {
   const navigate = useNavigate();

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import ApplicationForm from "@/components/applicationForm";
-import ApplicationList from "@/components/applicationList";
-import Layout from "@/components/Layout";
+import ApplicationForm from "@/components/application/ApplicationForm";
+import ApplicationList from "@/components/application/ApplicationList";
+import Layout from "@/components/layout/Layout";
 import {
   HiDocumentText,
   HiClock,

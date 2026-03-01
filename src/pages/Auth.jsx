@@ -1,9 +1,9 @@
 import React from "react";
 import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Login } from "@/components/Login";
-import { Signup } from "@/components/Signup";
-import ThemeToggle from "@/components/ThemeToggle";
+import { Login } from "@/components/auth/Login";
+import { Signup } from "@/components/auth/Signup";
+import ThemeToggle from "@/components/layout/ThemeToggle";
 
 const Auth = () => {
   const [searchParams] = useSearchParams();

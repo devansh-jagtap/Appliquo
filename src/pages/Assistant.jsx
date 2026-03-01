@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import Layout from "@/components/Layout";
+import Layout from "@/components/layout/Layout";
 import {
   HiSparkles,
   HiDocumentText,

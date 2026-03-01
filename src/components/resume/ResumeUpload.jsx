@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { supabase } from "../lib/supabase";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Textarea } from "./ui/textarea";
-import { Label } from "./ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { supabase } from "../../lib/supabase";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import { Label } from "../ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Upload } from "lucide-react";
 
 // ATS Score calculation helper
@@ -93,10 +93,8 @@ export default function ResumeUpload({ onResumeUploaded }) {
           .upload(fileName, file);
 
         if (uploadError) throw uploadError;
-
-        // Store the file path (not public URL) - we'll generate signed URLs when viewing
-        resumeContent = `PDF:${fileName}`; // Prefix to indicate it's a PDF file path
-        atsScore = 75; // Default score for PDF uploads
+        resumeContent = `PDF:${fileName}`; 
+        atsScore = 75; 
       } else {
         // Text resume
         resumeContent = content.trim();

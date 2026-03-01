@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
-import { supabase } from "../lib/supabase";
+import { supabase } from "../../lib/supabase";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
