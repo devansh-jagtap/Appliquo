@@ -5,7 +5,6 @@ import { ChevronRight, Sparkles, Zap, Target } from "lucide-react";
 import { Logo } from "@/components/landing/Logo";
 import { Faq } from "@/components/landing/FAQ";
 import Footer from "@/components/layout/Footer";
-import ThemeToggle from "@/components/layout/ThemeToggle";
 
 export default function HeroSection() {
   return (
@@ -21,7 +20,6 @@ export default function HeroSection() {
           </Button>
         </div>
       </header>
-      <ThemeToggle />
       <main className="overflow-hidden">
         <section className="relative min-h-screen flex items-center justify-center">
           {/* Background Image with Overlay */}

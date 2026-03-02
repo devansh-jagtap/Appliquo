@@ -8,36 +8,19 @@ export const useTheme = () => useContext(ThemeContext);
 
 // ThemeProvider component
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(() => {
-    // Try to get theme from localStorage or system preference
-    const saved =
-      typeof window !== "undefined" && localStorage.getItem("theme");
-    if (saved === "light" || saved === "dark") return saved;
-    if (
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches
-    )
-      return "dark";
-    return "light";
-  });
+  // Always use dark theme
+  const theme = "dark";
 
   useEffect(() => {
-    // Sync theme to localStorage and html class
-    localStorage.setItem("theme", theme);
+    // Force dark mode on mount
     const root = document.documentElement;
     const body = document.body;
-    if (theme === "dark") {
-      root.classList.add("dark");
-      body.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-      body.classList.remove("dark");
-    }
-  }, [theme]);
+    root.classList.add("dark");
+    body.classList.add("dark");
+  }, []);
 
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
-  };
+  // Keep toggleTheme for backwards compatibility (does nothing)
+  const toggleTheme = () => {};
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
