@@ -11,11 +11,11 @@ import { pdfjs } from "react-pdf";
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 // ATS Score calculation helper
-const calculateATSScore = (text) => {
+const calculateAtsScore = (text) => {
   let score = 0;
   const lower = text.toLowerCase();
 
-  // Length > 1500 characters → +20
+  // Length strictly greater than 1500 characters → +20
   if (text.length > 1500) score += 20;
 
   // Keywords check → +10 each
@@ -113,7 +113,7 @@ export default function ResumeUpload({ onResumeUploaded }) {
         resumeContent = `PDF:${fileName}`;
         try {
           const extractedText = await extractTextFromPdfFile(file);
-          atsScore = calculateATSScore(extractedText);
+          atsScore = calculateAtsScore(extractedText);
         } catch (pdfError) {
           console.error("Failed to extract PDF text for ATS scoring:", pdfError);
           atsScore = 0;
@@ -121,7 +121,7 @@ export default function ResumeUpload({ onResumeUploaded }) {
       } else {
         // Text resume
         resumeContent = content.trim();
-        atsScore = calculateATSScore(content);
+        atsScore = calculateAtsScore(content);
       }
 
       // Insert into resumes table
