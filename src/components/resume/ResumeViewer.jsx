@@ -1,23 +1,34 @@
 import { useEffect, useState, useMemo } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { supabase } from "../../lib/supabase";
-import {
-  calculateResumeQualityScore,
-  extractTextFromPdfBlob,
-} from "../../lib/resumeQuality";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
 // Set up PDF.js worker using react-pdf's bundled version
-pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+
+const extractLegacyPdfPath = (content) => {
+  if (!content?.includes("/resumes/")) return null;
+
+  try {
+    const parsedUrl = new URL(content);
+    const marker = "/resumes/";
+    const markerIndex = parsedUrl.pathname.indexOf(marker);
+    if (markerIndex === -1) return null;
+    return decodeURIComponent(parsedUrl.pathname.slice(markerIndex + marker.length));
+  } catch {
+    const marker = "/resumes/";
+    const markerIndex = content.indexOf(marker);
+    if (markerIndex === -1) return null;
+    return content.slice(markerIndex + marker.length).split("?")[0];
+  }
+};
 
 export default function ResumeViewer({ resume }) {
   const [url, setUrl] = useState(null);
   const [numPages, setNumPages] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [scoreDetails, setScoreDetails] = useState(null);
-  const displayScore = scoreDetails?.score ?? resume?.ats_score ?? 0;
 
   // Check if content is a PDF (either new format "PDF:path" or old URL format)
   const isPdfContent =
@@ -25,66 +36,6 @@ export default function ResumeViewer({ resume }) {
     (resume.content.startsWith("PDF:") ||
       resume.content.includes("/resumes/") ||
       (resume.content.startsWith("http") && resume.content.includes(".pdf")));
-
-  useEffect(() => {
-    const loadQualityBreakdown = async () => {
-      if (!resume) return;
-
-      try {
-        if (isPdfContent || resume.file_type === "pdf") {
-          let filePath = null;
-
-          if (resume.content?.startsWith("PDF:")) {
-            filePath = resume.content.substring(4);
-          } else if (resume.file_path) {
-            filePath = resume.file_path;
-          } else if (resume.content?.includes("/resumes/")) {
-            const match = resume.content.match(/\/resumes\/(.+)$/);
-            if (match) {
-              filePath = match[1];
-            }
-          }
-
-          if (!filePath) {
-            setScoreDetails({
-              score: resume.ats_score ?? 0,
-              breakdown: null,
-            });
-            return;
-          }
-
-          const { data: fileData, error: downloadError } = await supabase.storage
-            .from("resumes")
-            .download(filePath);
-
-          if (downloadError) {
-            setScoreDetails({
-              score: resume.ats_score ?? 0,
-              breakdown: null,
-            });
-            return;
-          }
-
-          const text = await extractTextFromPdfBlob(fileData);
-          setScoreDetails(calculateResumeQualityScore(text));
-          return;
-        }
-
-        setScoreDetails(calculateResumeQualityScore(resume.content || ""));
-      } catch (breakdownError) {
-        console.error(
-          "Error loading resume quality breakdown",
-          breakdownError,
-        );
-        setScoreDetails({
-          score: resume.ats_score ?? 0,
-          breakdown: null,
-        });
-      }
-    };
-
-    loadQualityBreakdown();
-  }, [resume, isPdfContent]);
 
   useEffect(() => {
     const loadPdf = async () => {
@@ -106,10 +57,7 @@ export default function ResumeViewer({ resume }) {
         }
         // Legacy: old public URL format (try to extract path)
         else if (resume.content?.includes("/resumes/")) {
-          const match = resume.content.match(/\/resumes\/(.+)$/);
-          if (match) {
-            filePath = match[1];
-          }
+          filePath = extractLegacyPdfPath(resume.content);
         }
 
         if (!filePath) {
@@ -164,36 +112,6 @@ export default function ResumeViewer({ resume }) {
     );
   };
 
-  const renderScoreSection = () => (
-    <>
-      <p className="text-sm font-medium text-green-600 mt-1">
-        Quality Score: {displayScore}%
-      </p>
-      <p className="text-xs text-gray-500 mt-1">
-        This is a resume quality indicator, not an actual ATS system.
-      </p>
-      {scoreDetails?.breakdown && (
-        <p className="text-xs text-gray-500 mt-2">
-          Structure: {scoreDetails.breakdown.structure.earned}/
-          {scoreDetails.breakdown.structure.total}, Sections:{" "}
-          {scoreDetails.breakdown.sections.earned}/
-          {scoreDetails.breakdown.sections.total}, Contact:{" "}
-          {scoreDetails.breakdown.contact.earned}/
-          {scoreDetails.breakdown.contact.total}, Action Verbs:{" "}
-          {scoreDetails.breakdown.actionVerbs.earned}/
-          {scoreDetails.breakdown.actionVerbs.total}, Results:{" "}
-          {scoreDetails.breakdown.results.earned}/
-          {scoreDetails.breakdown.results.total}
-        </p>
-      )}
-      {!scoreDetails?.breakdown && (
-        <p className="text-xs text-amber-600 mt-2">
-          Breakdown details are unavailable for this resume.
-        </p>
-      )}
-    </>
-  );
-
   if (!resume) {
     return (
       <div className="flex items-center justify-center h-64 text-gray-500">
@@ -228,7 +146,6 @@ export default function ResumeViewer({ resume }) {
       <div className="bg-white dark:bg-gray-900 rounded-lg border dark:border-gray-700">
         <div className="p-4 border-b dark:border-gray-700">
           <h2 className="text-xl font-bold dark:text-white">{resume.title}</h2>
-          {renderScoreSection()}
           {numPages && (
             <p className="text-sm text-gray-600 mt-1">
               {numPages} page{numPages !== 1 ? "s" : ""}
@@ -270,7 +187,6 @@ export default function ResumeViewer({ resume }) {
         <h2 className="text-xl font-bold mb-4 dark:text-white">
           {resume.title}
         </h2>
-        <div className="mb-4">{renderScoreSection()}</div>
         <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed dark:text-gray-200">
           {resume.content}
         </pre>

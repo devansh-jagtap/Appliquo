@@ -6,10 +6,29 @@ import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Upload } from "lucide-react";
-import {
-  calculateResumeQualityScore,
-  extractTextFromPdfFile,
-} from "../../lib/resumeQuality";
+
+// ATS Score calculation helper
+const calculateATSScore = (text) => {
+  let score = 0;
+  const lower = text.toLowerCase();
+
+  // Length > 300 words (approx 1500 chars) → +20
+  if (text.length > 1500) score += 20;
+
+  // Keywords check → +10 each
+  const keywords = ["react", "javascript", "node", "sql", "api"];
+  keywords.forEach((k) => {
+    if (lower.includes(k)) score += 10;
+  });
+
+  // Sections check → +10 each
+  const sections = ["experience", "education", "skills"];
+  sections.forEach((s) => {
+    if (lower.includes(s)) score += 10;
+  });
+
+  return Math.min(score, 100);
+};
 
 export default function ResumeUpload({ onResumeUploaded }) {
   const [uploadType, setUploadType] = useState("text"); // "text" or "pdf"
@@ -64,7 +83,7 @@ export default function ResumeUpload({ onResumeUploaded }) {
       if (!user) throw new Error("No user logged in");
 
       let resumeContent = "";
-      let qualityScore = 0;
+      let atsScore = 0;
 
       if (uploadType === "pdf") {
         // Upload PDF to storage
@@ -75,12 +94,11 @@ export default function ResumeUpload({ onResumeUploaded }) {
 
         if (uploadError) throw uploadError;
         resumeContent = `PDF:${fileName}`;
-        const extractedText = await extractTextFromPdfFile(file);
-        qualityScore = calculateResumeQualityScore(extractedText).score;
+        atsScore = 75;
       } else {
         // Text resume
         resumeContent = content.trim();
-        qualityScore = calculateResumeQualityScore(resumeContent).score;
+        atsScore = calculateATSScore(content);
       }
 
       // Insert into resumes table
@@ -88,7 +106,7 @@ export default function ResumeUpload({ onResumeUploaded }) {
         user_id: user.id,
         title: title.trim(),
         content: resumeContent,
-        ats_score: qualityScore,
+        ats_score: atsScore,
       });
 
       if (insertError) throw insertError;

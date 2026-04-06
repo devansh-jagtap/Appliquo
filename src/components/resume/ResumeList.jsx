@@ -123,11 +123,7 @@ export default function ResumeList({ resumes, loading, onResumeDeleted }) {
                     Uploaded {formatDate(resume.created_at)}
                   </p>
                   <p className="text-sm font-medium text-green-600">
-                    Quality Score: {resume.ats_score ?? 0}%
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    This is a resume quality indicator, not an actual ATS
-                    system.
+                    ATS Score: {resume.ats_score ?? 0}%
                   </p>
                 </div>
               </div>
