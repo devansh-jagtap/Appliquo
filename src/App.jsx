@@ -1,22 +1,43 @@
-import { useState, useEffect, useRef } from "react";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Assistant from "./pages/Assistant";
 import Resume from "./pages/Resume";
 import HeroSection from "./components/landing/HeroSection";
-import { Layout } from "lucide-react";
 import Auth from "./pages/Auth";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { supabase } from "./lib/supabase";
 
 function App() {
   useEffect(() => {
-    // Handle OAuth callback
+    const clearAuthUrlArtifacts = () => {
+      if (window.location.hash || window.location.search) {
+        window.history.replaceState(null, "", window.location.pathname);
+      }
+    };
+
+    const isRecoverableAuthError = (message = "") => {
+      const normalized = message.toLowerCase();
+      return (
+        normalized.includes("issued in the future") ||
+        normalized.includes("jwt") ||
+        normalized.includes("token") ||
+        normalized.includes("401") ||
+        normalized.includes("unauthorized")
+      );
+    };
+
     const handleOAuthCallback = async () => {
       const { data, error } = await supabase.auth.getSession();
-      if (data?.session && window.location.hash) {
-        // Clear the hash from URL
-        window.history.replaceState(null, "", window.location.pathname);
+
+      if (error && isRecoverableAuthError(error.message)) {
+        await supabase.auth.signOut({ scope: "local" });
+        clearAuthUrlArtifacts();
+        return;
+      }
+
+      if (data?.session) {
+        clearAuthUrlArtifacts();
       }
     };
 

@@ -7,11 +7,29 @@ export function ProtectedRoute({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check current session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+    const hydrateSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        setSession(null);
+        setLoading(false);
+        return;
+      }
+
+      const nowInSeconds = Math.floor(Date.now() / 1000);
+      if (session.expires_at && session.expires_at <= nowInSeconds) {
+        await supabase.auth.signOut({ scope: "local" });
+        setSession(null);
+      } else {
+        setSession(session);
+      }
+
       setLoading(false);
-    });
+    };
+
+    hydrateSession();
 
     // Listen for auth changes (logout, login, etc.)
     const {

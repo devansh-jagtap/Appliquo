@@ -94,11 +94,10 @@ export default function ResumeUpload({ onResumeUploaded }) {
 
       // Get logged-in user
       const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
 
-      if (userError) throw userError;
+      const user = session?.user;
       if (!user) throw new Error("No user logged in");
 
       let resumeContent = "";
