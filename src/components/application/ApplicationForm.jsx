@@ -14,6 +14,7 @@ import {
 const ApplicationForm = ({ onAddApplication }) => {
   const [companyName, setCompanyName] = React.useState("");
   const [role, setRole] = React.useState("");
+  const [platform, setPlatform] = React.useState("");
   const [status, setStatus] = React.useState("Applied");
 
   const handleSubmit = () => {
@@ -23,10 +24,12 @@ const ApplicationForm = ({ onAddApplication }) => {
         companyName,
         role,
         status,
+        platform,
         date: new Date().toLocaleDateString(),
       });
       setCompanyName("");
       setRole("");
+      setPlatform("");
       setStatus("Applied");
     }
   };
@@ -70,6 +73,17 @@ const ApplicationForm = ({ onAddApplication }) => {
               <SelectItem value="Rejected">Rejected</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="Platform">
+            Platform - Where you filed the application{" "}
+          </Label>
+          <Input
+            id="Platform"
+            placeholder="Enter Platform where you filled the application"
+            value={platform}
+            onChange={(e) => setPlatform(e.target.value)}
+          />
         </div>
 
         <Button onClick={handleSubmit}>Add Application</Button>

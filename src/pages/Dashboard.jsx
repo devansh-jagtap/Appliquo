@@ -41,6 +41,7 @@ const Dashboard = () => {
       {
         company: newApplication.companyName,
         role: newApplication.role,
+        platform: newApplication.platform,
         status: newApplication.status,
         user_id: user.id,
       },
