@@ -1,6 +1,6 @@
 import { pdfjs } from "react-pdf";
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 const ACTION_VERBS = [
   "developed",
@@ -14,6 +14,17 @@ const ACTION_VERBS = [
   "achieved",
 ];
 
+const IDEAL_LENGTH_THRESHOLD = 1500;
+const MIN_LENGTH_THRESHOLD = 500;
+const IDEAL_LENGTH_SCORE = 15;
+const MIN_LENGTH_SCORE = 10;
+const POINTS_PER_ACTION_VERB = 2;
+const MAX_ACTION_VERB_POINTS = 20;
+const hasWholeWord = (text, word) =>
+  new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(
+    text,
+  );
+
 export const calculateResumeQualityScore = (text = "") => {
   const lower = text.toLowerCase();
   const breakdown = {
@@ -24,15 +35,18 @@ export const calculateResumeQualityScore = (text = "") => {
     results: { earned: 0, total: 10 },
   };
 
-  if (text.length > 1500) {
-    breakdown.structure.earned = 15;
-  } else if (text.length > 500 && text.length <= 1500) {
-    breakdown.structure.earned = 10;
+  if (text.length > IDEAL_LENGTH_THRESHOLD) {
+    breakdown.structure.earned = IDEAL_LENGTH_SCORE;
+  } else if (
+    text.length > MIN_LENGTH_THRESHOLD &&
+    text.length <= IDEAL_LENGTH_THRESHOLD
+  ) {
+    breakdown.structure.earned = MIN_LENGTH_SCORE;
   }
 
   const sections = ["experience", "education", "skills"];
   sections.forEach((section) => {
-    if (lower.includes(section)) {
+    if (hasWholeWord(lower, section)) {
       breakdown.sections.earned += 10;
     }
   });
@@ -43,11 +57,16 @@ export const calculateResumeQualityScore = (text = "") => {
   if (hasEmail) breakdown.contact.earned += 8;
   if (hasPhone) breakdown.contact.earned += 7;
 
-  const verbCount = ACTION_VERBS.filter((verb) => lower.includes(verb)).length;
-  breakdown.actionVerbs.earned = Math.min(verbCount * 2, 20);
+  const verbCount = ACTION_VERBS.filter((verb) =>
+    hasWholeWord(lower, verb),
+  ).length;
+  breakdown.actionVerbs.earned = Math.min(
+    verbCount * POINTS_PER_ACTION_VERB,
+    MAX_ACTION_VERB_POINTS,
+  );
 
-  const hasNumbers = /\d+%|\d+x|\$\d+/.test(text);
-  if (hasNumbers) breakdown.results.earned = 10;
+  const hasQuantifiableResults = /\d+%|\d+x|\$\d+/.test(text);
+  if (hasQuantifiableResults) breakdown.results.earned = 10;
 
   const score = Math.min(
     breakdown.structure.earned +
@@ -74,6 +93,10 @@ export const extractTextFromPdfArrayBuffer = async (arrayBuffer) => {
   }
 
   return text.trim();
+};
+
+export const extractTextFromPdfBlob = async (pdfBlob) => {
+  return extractTextFromPdfArrayBuffer(await pdfBlob.arrayBuffer());
 };
 
 export const extractTextFromPdfFile = async (file) => {
