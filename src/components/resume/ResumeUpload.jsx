@@ -6,28 +6,47 @@ import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Upload } from "lucide-react";
+import { pdfjs } from "react-pdf";
+
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 // ATS Score calculation helper
-const calculateATSScore = (text) => {
+const hasWholeWord = (text, token) => new RegExp(`\\b${token}\\b`, "i").test(text);
+
+const calculateAtsScore = (text) => {
   let score = 0;
   const lower = text.toLowerCase();
 
-  // Length > 300 words (approx 1500 chars) → +20
+  // Length greater than 1500 characters → +20
   if (text.length > 1500) score += 20;
 
   // Keywords check → +10 each
   const keywords = ["react", "javascript", "node", "sql", "api"];
   keywords.forEach((k) => {
-    if (lower.includes(k)) score += 10;
+    if (hasWholeWord(lower, k)) score += 10;
   });
 
   // Sections check → +10 each
   const sections = ["experience", "education", "skills"];
   sections.forEach((s) => {
-    if (lower.includes(s)) score += 10;
+    if (hasWholeWord(lower, s)) score += 10;
   });
 
   return Math.min(score, 100);
+};
+
+const extractTextFromPdfFile = async (file) => {
+  const typedArray = new Uint8Array(await file.arrayBuffer());
+  const pdf = await pdfjs.getDocument({ data: typedArray }).promise;
+  let text = "";
+
+  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+    const page = await pdf.getPage(pageNumber);
+    const content = await page.getTextContent();
+    text += ` ${content.items.map((item) => item.str || "").join(" ")}`;
+  }
+
+  return text.trim();
 };
 
 export default function ResumeUpload({ onResumeUploaded }) {
@@ -88,17 +107,26 @@ export default function ResumeUpload({ onResumeUploaded }) {
       if (uploadType === "pdf") {
         // Upload PDF to storage
         const fileName = `${user.id}/${Date.now()}_${file.name}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
           .from("resumes")
           .upload(fileName, file);
 
         if (uploadError) throw uploadError;
         resumeContent = `PDF:${fileName}`;
-        atsScore = 75;
+        try {
+          const extractedText = await extractTextFromPdfFile(file);
+          atsScore = calculateAtsScore(extractedText);
+        } catch (pdfError) {
+          console.error(
+            `Failed to extract PDF text for ATS scoring (${file.name}):`,
+            pdfError,
+          );
+          atsScore = 0;
+        }
       } else {
         // Text resume
         resumeContent = content.trim();
-        atsScore = calculateATSScore(content);
+        atsScore = calculateAtsScore(content);
       }
 
       // Insert into resumes table

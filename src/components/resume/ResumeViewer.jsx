@@ -5,7 +5,28 @@ import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
 // Set up PDF.js worker using react-pdf's bundled version
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+
+const extractLegacyPdfPath = (content) => {
+  const RESUMES_MARKER = "/resumes/";
+  if (!content) return null;
+
+  try {
+    const parsedUrl = new URL(content);
+    const markerIndex = parsedUrl.pathname.indexOf(RESUMES_MARKER);
+    if (markerIndex !== -1) {
+      return decodeURIComponent(
+        parsedUrl.pathname.slice(markerIndex + RESUMES_MARKER.length),
+      );
+    }
+  } catch {
+    // Fall through to string parsing below.
+  }
+
+  const markerIndex = content.indexOf(RESUMES_MARKER);
+  if (markerIndex === -1) return null;
+  return content.slice(markerIndex + RESUMES_MARKER.length).split("?")[0];
+};
 
 export default function ResumeViewer({ resume }) {
   const [url, setUrl] = useState(null);
@@ -40,10 +61,7 @@ export default function ResumeViewer({ resume }) {
         }
         // Legacy: old public URL format (try to extract path)
         else if (resume.content?.includes("/resumes/")) {
-          const match = resume.content.match(/\/resumes\/(.+)$/);
-          if (match) {
-            filePath = match[1];
-          }
+          filePath = extractLegacyPdfPath(resume.content);
         }
 
         if (!filePath) {
