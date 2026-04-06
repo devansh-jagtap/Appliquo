@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { supabase } from "../../lib/supabase";
+import { calculateResumeQualityScore, extractTextFromPdfArrayBuffer } from "../../lib/resumeQuality";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
@@ -12,6 +13,7 @@ export default function ResumeViewer({ resume }) {
   const [numPages, setNumPages] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [scoreDetails, setScoreDetails] = useState(null);
 
   // Check if content is a PDF (either new format "PDF:path" or old URL format)
   const isPdfContent =
@@ -19,6 +21,64 @@ export default function ResumeViewer({ resume }) {
     (resume.content.startsWith("PDF:") ||
       resume.content.includes("/resumes/") ||
       (resume.content.startsWith("http") && resume.content.includes(".pdf")));
+
+  useEffect(() => {
+    const loadQualityBreakdown = async () => {
+      if (!resume) return;
+
+      try {
+        if (isPdfContent || resume.file_type === "pdf") {
+          let filePath = null;
+
+          if (resume.content?.startsWith("PDF:")) {
+            filePath = resume.content.substring(4);
+          } else if (resume.file_path) {
+            filePath = resume.file_path;
+          } else if (resume.content?.includes("/resumes/")) {
+            const match = resume.content.match(/\/resumes\/(.+)$/);
+            if (match) {
+              filePath = match[1];
+            }
+          }
+
+          if (!filePath) {
+            setScoreDetails({
+              score: resume.ats_score ?? 0,
+              breakdown: null,
+            });
+            return;
+          }
+
+          const { data: fileData, error: downloadError } = await supabase.storage
+            .from("resumes")
+            .download(filePath);
+
+          if (downloadError) {
+            setScoreDetails({
+              score: resume.ats_score ?? 0,
+              breakdown: null,
+            });
+            return;
+          }
+
+          const text = await extractTextFromPdfArrayBuffer(
+            await fileData.arrayBuffer(),
+          );
+          setScoreDetails(calculateResumeQualityScore(text));
+          return;
+        }
+
+        setScoreDetails(calculateResumeQualityScore(resume.content || ""));
+      } catch {
+        setScoreDetails({
+          score: resume.ats_score ?? 0,
+          breakdown: null,
+        });
+      }
+    };
+
+    loadQualityBreakdown();
+  }, [resume, isPdfContent]);
 
   useEffect(() => {
     const loadPdf = async () => {
@@ -132,6 +192,26 @@ export default function ResumeViewer({ resume }) {
       <div className="bg-white dark:bg-gray-900 rounded-lg border dark:border-gray-700">
         <div className="p-4 border-b dark:border-gray-700">
           <h2 className="text-xl font-bold dark:text-white">{resume.title}</h2>
+          <p className="text-sm font-medium text-green-600 mt-1">
+            Quality Score: {(scoreDetails?.score ?? resume.ats_score ?? 0)}%
+          </p>
+          <p className="text-xs text-gray-500 mt-1">
+            This is a resume quality indicator, not an actual ATS system.
+          </p>
+          {scoreDetails?.breakdown && (
+            <p className="text-xs text-gray-500 mt-2">
+              Structure: {scoreDetails.breakdown.structure.earned}/
+              {scoreDetails.breakdown.structure.total}, Sections:{" "}
+              {scoreDetails.breakdown.sections.earned}/
+              {scoreDetails.breakdown.sections.total}, Contact:{" "}
+              {scoreDetails.breakdown.contact.earned}/
+              {scoreDetails.breakdown.contact.total}, Action Verbs:{" "}
+              {scoreDetails.breakdown.actionVerbs.earned}/
+              {scoreDetails.breakdown.actionVerbs.total}, Results:{" "}
+              {scoreDetails.breakdown.results.earned}/
+              {scoreDetails.breakdown.results.total}
+            </p>
+          )}
           {numPages && (
             <p className="text-sm text-gray-600 mt-1">
               {numPages} page{numPages !== 1 ? "s" : ""}
@@ -173,6 +253,26 @@ export default function ResumeViewer({ resume }) {
         <h2 className="text-xl font-bold mb-4 dark:text-white">
           {resume.title}
         </h2>
+        <p className="text-sm font-medium text-green-600 mb-1">
+          Quality Score: {(scoreDetails?.score ?? resume.ats_score ?? 0)}%
+        </p>
+        <p className="text-xs text-gray-500 mb-2">
+          This is a resume quality indicator, not an actual ATS system.
+        </p>
+        {scoreDetails?.breakdown && (
+          <p className="text-xs text-gray-500 mb-4">
+            Structure: {scoreDetails.breakdown.structure.earned}/
+            {scoreDetails.breakdown.structure.total}, Sections:{" "}
+            {scoreDetails.breakdown.sections.earned}/
+            {scoreDetails.breakdown.sections.total}, Contact:{" "}
+            {scoreDetails.breakdown.contact.earned}/
+            {scoreDetails.breakdown.contact.total}, Action Verbs:{" "}
+            {scoreDetails.breakdown.actionVerbs.earned}/
+            {scoreDetails.breakdown.actionVerbs.total}, Results:{" "}
+            {scoreDetails.breakdown.results.earned}/
+            {scoreDetails.breakdown.results.total}
+          </p>
+        )}
         <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed dark:text-gray-200">
           {resume.content}
         </pre>

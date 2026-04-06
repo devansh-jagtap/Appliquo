@@ -6,29 +6,10 @@ import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Upload } from "lucide-react";
-
-// ATS Score calculation helper
-const calculateATSScore = (text) => {
-  let score = 0;
-  const lower = text.toLowerCase();
-
-  // Length > 300 words (approx 1500 chars) → +20
-  if (text.length > 1500) score += 20;
-
-  // Keywords check → +10 each
-  const keywords = ["react", "javascript", "node", "sql", "api"];
-  keywords.forEach((k) => {
-    if (lower.includes(k)) score += 10;
-  });
-
-  // Sections check → +10 each
-  const sections = ["experience", "education", "skills"];
-  sections.forEach((s) => {
-    if (lower.includes(s)) score += 10;
-  });
-
-  return Math.min(score, 100);
-};
+import {
+  calculateResumeQualityScore,
+  extractTextFromPdfFile,
+} from "../../lib/resumeQuality";
 
 export default function ResumeUpload({ onResumeUploaded }) {
   const [uploadType, setUploadType] = useState("text"); // "text" or "pdf"
@@ -83,22 +64,23 @@ export default function ResumeUpload({ onResumeUploaded }) {
       if (!user) throw new Error("No user logged in");
 
       let resumeContent = "";
-      let atsScore = 0;
+      let qualityScore = 0;
 
       if (uploadType === "pdf") {
         // Upload PDF to storage
         const fileName = `${user.id}/${Date.now()}_${file.name}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
           .from("resumes")
           .upload(fileName, file);
 
         if (uploadError) throw uploadError;
         resumeContent = `PDF:${fileName}`;
-        atsScore = 75;
+        const extractedText = await extractTextFromPdfFile(file);
+        qualityScore = calculateResumeQualityScore(extractedText).score;
       } else {
         // Text resume
         resumeContent = content.trim();
-        atsScore = calculateATSScore(content);
+        qualityScore = calculateResumeQualityScore(resumeContent).score;
       }
 
       // Insert into resumes table
@@ -106,7 +88,7 @@ export default function ResumeUpload({ onResumeUploaded }) {
         user_id: user.id,
         title: title.trim(),
         content: resumeContent,
-        ats_score: atsScore,
+        ats_score: qualityScore,
       });
 
       if (insertError) throw insertError;
