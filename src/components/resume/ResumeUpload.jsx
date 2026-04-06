@@ -11,6 +11,8 @@ import { pdfjs } from "react-pdf";
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 // ATS Score calculation helper
+const hasWholeWord = (text, token) => new RegExp(`\\b${token}\\b`, "i").test(text);
+
 const calculateAtsScore = (text) => {
   let score = 0;
   const lower = text.toLowerCase();
@@ -21,13 +23,13 @@ const calculateAtsScore = (text) => {
   // Keywords check → +10 each
   const keywords = ["react", "javascript", "node", "sql", "api"];
   keywords.forEach((k) => {
-    if (lower.includes(k)) score += 10;
+    if (hasWholeWord(lower, k)) score += 10;
   });
 
   // Sections check → +10 each
   const sections = ["experience", "education", "skills"];
   sections.forEach((s) => {
-    if (lower.includes(s)) score += 10;
+    if (hasWholeWord(lower, s)) score += 10;
   });
 
   return Math.min(score, 100);

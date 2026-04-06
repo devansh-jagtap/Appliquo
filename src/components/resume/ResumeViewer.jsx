@@ -9,20 +9,23 @@ pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.vers
 
 const extractLegacyPdfPath = (content) => {
   const RESUMES_MARKER = "/resumes/";
-  if (!content?.includes(RESUMES_MARKER)) return null;
+  if (!content) return null;
 
   try {
     const parsedUrl = new URL(content);
     const markerIndex = parsedUrl.pathname.indexOf(RESUMES_MARKER);
-    if (markerIndex === -1) return null;
-    return decodeURIComponent(
-      parsedUrl.pathname.slice(markerIndex + RESUMES_MARKER.length),
-    );
+    if (markerIndex !== -1) {
+      return decodeURIComponent(
+        parsedUrl.pathname.slice(markerIndex + RESUMES_MARKER.length),
+      );
+    }
   } catch {
-    const markerIndex = content.indexOf(RESUMES_MARKER);
-    if (markerIndex === -1) return null;
-    return content.slice(markerIndex + RESUMES_MARKER.length).split("?")[0];
+    // Fall through to string parsing below.
   }
+
+  const markerIndex = content.indexOf(RESUMES_MARKER);
+  if (markerIndex === -1) return null;
+  return content.slice(markerIndex + RESUMES_MARKER.length).split("?")[0];
 };
 
 export default function ResumeViewer({ resume }) {
