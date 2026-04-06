@@ -119,9 +119,6 @@ export default function ResumeUpload({ onResumeUploaded }) {
             `Failed to extract PDF text for ATS scoring (${file.name}):`,
             pdfError,
           );
-          alert(
-            "Couldn't extract text from this PDF for ATS scoring. Score was set to 0.",
-          );
           atsScore = 0;
         }
       } else {

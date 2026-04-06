@@ -9,7 +9,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.vers
 
 const extractLegacyPdfPath = (content) => {
   const RESUMES_MARKER = "/resumes/";
-  if (!content?.includes("/resumes/")) return null;
+  if (!content?.includes(RESUMES_MARKER)) return null;
 
   try {
     const parsedUrl = new URL(content);
