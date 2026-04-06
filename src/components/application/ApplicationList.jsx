@@ -26,11 +26,7 @@ const ApplicationList = ({
             No applications yet
           </p>
         ) : (
-<<<<<<< Updated upstream:src/components/application/ApplicationList.jsx
-          <div className="space-y-4 grid grid-cols-1 gap-5">
-=======
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
->>>>>>> Stashed changes:src/components/applicationList.jsx
             {applications.map((app) => (
               <Card key={app.id} className="relative">
                 <CardHeader className="pb-3">
