@@ -6,13 +6,16 @@ import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Upload } from "lucide-react";
+import { pdfjs } from "react-pdf";
+
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 // ATS Score calculation helper
 const calculateATSScore = (text) => {
   let score = 0;
   const lower = text.toLowerCase();
 
-  // Length > 300 words (approx 1500 chars) → +20
+  // Length > 1500 characters → +20
   if (text.length > 1500) score += 20;
 
   // Keywords check → +10 each
@@ -28,6 +31,20 @@ const calculateATSScore = (text) => {
   });
 
   return Math.min(score, 100);
+};
+
+const extractTextFromPdfFile = async (file) => {
+  const typedArray = new Uint8Array(await file.arrayBuffer());
+  const pdf = await pdfjs.getDocument({ data: typedArray }).promise;
+  let text = "";
+
+  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+    const page = await pdf.getPage(pageNumber);
+    const content = await page.getTextContent();
+    text += ` ${content.items.map((item) => item.str || "").join(" ")}`;
+  }
+
+  return text.trim();
 };
 
 export default function ResumeUpload({ onResumeUploaded }) {
@@ -94,7 +111,13 @@ export default function ResumeUpload({ onResumeUploaded }) {
 
         if (uploadError) throw uploadError;
         resumeContent = `PDF:${fileName}`;
-        atsScore = 75;
+        try {
+          const extractedText = await extractTextFromPdfFile(file);
+          atsScore = calculateATSScore(extractedText);
+        } catch (pdfError) {
+          console.error("Failed to extract PDF text for ATS scoring:", pdfError);
+          atsScore = 0;
+        }
       } else {
         // Text resume
         resumeContent = content.trim();
