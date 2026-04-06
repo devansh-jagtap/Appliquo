@@ -15,7 +15,7 @@ const calculateAtsScore = (text) => {
   let score = 0;
   const lower = text.toLowerCase();
 
-  // Length strictly greater than 1500 characters → +20
+  // Length greater than 1500 characters → +20
   if (text.length > 1500) score += 20;
 
   // Keywords check → +10 each
@@ -115,7 +115,13 @@ export default function ResumeUpload({ onResumeUploaded }) {
           const extractedText = await extractTextFromPdfFile(file);
           atsScore = calculateAtsScore(extractedText);
         } catch (pdfError) {
-          console.error("Failed to extract PDF text for ATS scoring:", pdfError);
+          console.error(
+            `Failed to extract PDF text for ATS scoring (${file.name}):`,
+            pdfError,
+          );
+          alert(
+            "Couldn't extract text from this PDF for ATS scoring. Score was set to 0.",
+          );
           atsScore = 0;
         }
       } else {

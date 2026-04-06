@@ -8,19 +8,20 @@ import "react-pdf/dist/Page/TextLayer.css";
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 const extractLegacyPdfPath = (content) => {
+  const RESUMES_MARKER = "/resumes/";
   if (!content?.includes("/resumes/")) return null;
 
   try {
     const parsedUrl = new URL(content);
-    const marker = "/resumes/";
-    const markerIndex = parsedUrl.pathname.indexOf(marker);
+    const markerIndex = parsedUrl.pathname.indexOf(RESUMES_MARKER);
     if (markerIndex === -1) return null;
-    return decodeURIComponent(parsedUrl.pathname.slice(markerIndex + marker.length));
+    return decodeURIComponent(
+      parsedUrl.pathname.slice(markerIndex + RESUMES_MARKER.length),
+    );
   } catch {
-    const marker = "/resumes/";
-    const markerIndex = content.indexOf(marker);
+    const markerIndex = content.indexOf(RESUMES_MARKER);
     if (markerIndex === -1) return null;
-    return content.slice(markerIndex + marker.length).split("?")[0];
+    return content.slice(markerIndex + RESUMES_MARKER.length).split("?")[0];
   }
 };
 
