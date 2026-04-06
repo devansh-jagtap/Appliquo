@@ -2,7 +2,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Sparkles, Zap, Target } from "lucide-react";
-import { Logo } from "@/components/landing/Logo";
 import { Faq } from "@/components/landing/FAQ";
 import Footer from "@/components/layout/Footer";
 

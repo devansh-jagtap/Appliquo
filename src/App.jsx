@@ -19,7 +19,7 @@ function App() {
         window.history.replaceState(null, "", window.location.pathname);
       }
     };
-    
+
     handleOAuthCallback();
   }, []);
   // const [applications, setApplications] = useState([]);
