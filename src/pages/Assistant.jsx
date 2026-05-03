@@ -10,6 +10,7 @@ import {
   HiChartBar,
   HiBriefcase,
 } from "react-icons/hi2";
+import { Loader2 } from "lucide-react";
 
 const generatePrompt = (jobDescription, resumeText) => {
   return `
@@ -168,8 +169,17 @@ const Assistant = () => {
               onClick={handleGenerator}
               disabled={isLoading}
             >
-              <HiSparkles className="mr-2 h-5 w-5" />
-              {isLoading ? "Generating..." : "Generate AI Suggestions"}
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <HiSparkles className="mr-2 h-5 w-5" />
+                  Generate AI Suggestions
+                </>
+              )}
             </Button>
           </div>
 
@@ -185,9 +195,12 @@ const Assistant = () => {
               </CardHeader>
               <CardContent>
                 {!result ? (
-                  <p className="text-sm text-muted-foreground">
-                    Resume improvements will appear here after generation.
-                  </p>
+                  <div className="flex flex-col items-center py-6 text-center text-muted-foreground">
+                    <HiDocumentText className="mb-2 h-8 w-8 opacity-40" />
+                    <p className="text-sm">
+                      Resume improvements will appear here after generation.
+                    </p>
+                  </div>
                 ) : (
                   <p className="whitespace-pre-line text-sm text-card-foreground">
                     {result.resume}
@@ -206,9 +219,12 @@ const Assistant = () => {
               </CardHeader>
               <CardContent>
                 {!result ? (
-                  <p className="text-sm text-muted-foreground">
-                    A tailored cover letter will appear here after generation.
-                  </p>
+                  <div className="flex flex-col items-center py-6 text-center text-muted-foreground">
+                    <HiPencil className="mb-2 h-8 w-8 opacity-40" />
+                    <p className="text-sm">
+                      A tailored cover letter will appear here after generation.
+                    </p>
+                  </div>
                 ) : (
                   <p className="whitespace-pre-line text-sm text-card-foreground">
                     {result.coverLetter}
@@ -227,9 +243,12 @@ const Assistant = () => {
               </CardHeader>
               <CardContent>
                 {!result ? (
-                  <p className="text-sm text-muted-foreground">
-                    Missing skills analysis will appear here after generation.
-                  </p>
+                  <div className="flex flex-col items-center py-6 text-center text-muted-foreground">
+                    <HiChartBar className="mb-2 h-8 w-8 opacity-40" />
+                    <p className="text-sm">
+                      Missing skills analysis will appear here after generation.
+                    </p>
+                  </div>
                 ) : (
                   <p className="whitespace-pre-line text-sm text-card-foreground">
                     {result.skills}

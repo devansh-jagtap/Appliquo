@@ -5,6 +5,44 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { HiTrash, HiDocumentText, HiEye } from "react-icons/hi2";
 import ResumeViewer from "./ResumeViewer";
 
+const AtsScoreBar = ({ score }) => {
+  const pct = score ?? 0;
+  const color =
+    pct >= 70
+      ? "bg-green-500"
+      : pct >= 40
+        ? "bg-amber-500"
+        : "bg-red-500";
+
+  return (
+    <div
+      className="mt-2"
+      aria-label={`ATS Score: ${pct}% - ${pct >= 70 ? "Good" : pct >= 40 ? "Fair" : "Poor"}`}
+    >
+      <div className="mb-1 flex items-center justify-between text-xs">
+        <span className="text-muted-foreground">ATS Score</span>
+        <span
+          className={`font-semibold ${
+            pct >= 70
+              ? "text-green-600 dark:text-green-400"
+              : pct >= 40
+                ? "text-amber-600 dark:text-amber-400"
+                : "text-red-500 dark:text-red-400"
+          }`}
+        >
+          {pct}%
+        </span>
+      </div>
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+        <div
+          className={`h-full rounded-full transition-all duration-500 ${color}`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  );
+};
+
 export default function ResumeList({ resumes, loading, onResumeDeleted }) {
   const [deleting, setDeleting] = useState(null);
   const [viewingResume, setViewingResume] = useState(null);
@@ -64,8 +102,16 @@ export default function ResumeList({ resumes, loading, onResumeDeleted }) {
   if (loading) {
     return (
       <Card>
-        <CardContent className="py-12 text-center text-muted-foreground">
-          Loading resumes...
+        <CardHeader>
+          <CardTitle>Your Resumes</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="h-20 animate-pulse rounded-lg bg-muted"
+            />
+          ))}
         </CardContent>
       </Card>
     );
@@ -113,8 +159,8 @@ export default function ResumeList({ resumes, loading, onResumeDeleted }) {
               key={resume.id}
               className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-accent/50 transition"
             >
-              <div className="flex items-start gap-3 flex-1">
-                <HiDocumentText className="h-6 w-6 text-blue-600 flex-shrink-0 mt-1" />
+              <div className="flex items-start gap-3 flex-1 min-w-0">
+                <HiDocumentText className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-foreground truncate">
                     {resume.title}
@@ -122,9 +168,7 @@ export default function ResumeList({ resumes, loading, onResumeDeleted }) {
                   <p className="text-sm text-muted-foreground">
                     Uploaded {formatDate(resume.created_at)}
                   </p>
-                  <p className="text-sm font-medium text-green-600">
-                    ATS Score: {resume.ats_score ?? 0}%
-                  </p>
+                  <AtsScoreBar score={resume.ats_score} />
                 </div>
               </div>
 

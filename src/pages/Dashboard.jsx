@@ -104,19 +104,19 @@ const Dashboard = () => {
       title: "Pending",
       value: pendingApplications,
       icon: HiClock,
-      color: "blue",
+      color: "amber",
     },
     {
       title: "Accepted",
       value: acceptedApplications,
       icon: HiCheckCircle,
-      color: "blue",
+      color: "green",
     },
     {
       title: "Rejected",
       value: rejectedApplications,
       icon: HiXCircle,
-      color: "gray",
+      color: "red",
     },
   ];
 
@@ -135,39 +135,54 @@ const Dashboard = () => {
         <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
+            const colorMap = {
+              blue: {
+                bg: "bg-primary/10",
+                icon: "text-primary",
+                value: "text-primary",
+              },
+              amber: {
+                bg: "bg-amber-100 dark:bg-amber-900/30",
+                icon: "text-amber-600 dark:text-amber-400",
+                value: "text-amber-600 dark:text-amber-400",
+              },
+              green: {
+                bg: "bg-green-100 dark:bg-green-900/30",
+                icon: "text-green-600 dark:text-green-400",
+                value: "text-green-600 dark:text-green-400",
+              },
+              red: {
+                bg: "bg-red-100 dark:bg-red-900/30",
+                icon: "text-red-500 dark:text-red-400",
+                value: "text-red-500 dark:text-red-400",
+              },
+            };
+            const colors = colorMap[stat.color] || colorMap.blue;
             return (
               <div
                 key={index}
-                className="rounded-xl border border-border bg-card p-6 shadow-sm"
+                className="rounded-xl border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md"
               >
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">
                       {stat.title}
                     </p>
-                    <p className="mt-2 text-3xl font-bold text-card-foreground">
+                    <p className={`mt-2 text-3xl font-bold ${colors.value}`}>
                       {stat.value}
                     </p>
                   </div>
                   <div
-                    className={`flex h-12 w-12 items-center justify-center rounded-lg ${
-                      stat.color === "blue" ? "bg-primary/10" : "bg-muted"
-                    }`}
+                    className={`flex h-12 w-12 items-center justify-center rounded-lg ${colors.bg}`}
                   >
-                    <Icon
-                      className={`h-6 w-6 ${
-                        stat.color === "blue"
-                          ? "text-primary"
-                          : "text-muted-foreground"
-                      }`}
-                    />
+                    <Icon className={`h-6 w-6 ${colors.icon}`} />
                   </div>
                 </div>
               </div>
             );
           })}
         </div>
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           {/* Application Form */}
           <div className="mb-8">
             <ApplicationForm onAddApplication={handleAddApplication} />

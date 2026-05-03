@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { HiPlusCircle } from "react-icons/hi2";
 
 const ApplicationForm = ({ onAddApplication }) => {
   const [companyName, setCompanyName] = React.useState("");
@@ -32,32 +33,35 @@ const ApplicationForm = ({ onAddApplication }) => {
   };
 
   return (
-    <Card>
+    <Card className="h-fit">
       <CardHeader>
-        <CardTitle>Add Application</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <HiPlusCircle className="h-5 w-5 text-primary" />
+          Add Application
+        </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-2">
-        <div className="space-y-2">
+      <CardContent className="space-y-4">
+        <div className="space-y-1.5">
           <Label htmlFor="company">Company Name</Label>
           <Input
             id="company"
-            placeholder="Enter company name"
+            placeholder="e.g. Google, Microsoft"
             value={companyName}
             onChange={(e) => setCompanyName(e.target.value)}
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <Label htmlFor="role">Role / Position</Label>
           <Input
             id="role"
-            placeholder="Enter role or position"
+            placeholder="e.g. Software Engineer"
             value={role}
             onChange={(e) => setRole(e.target.value)}
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <Label htmlFor="status">Status</Label>
           <Select value={status} onValueChange={setStatus}>
             <SelectTrigger id="status">
@@ -72,7 +76,14 @@ const ApplicationForm = ({ onAddApplication }) => {
           </Select>
         </div>
 
-        <Button onClick={handleSubmit}>Add Application</Button>
+        <Button
+          onClick={handleSubmit}
+          disabled={!companyName || !role}
+          className="w-full"
+        >
+          <HiPlusCircle className="mr-2 h-4 w-4" />
+          Add Application
+        </Button>
       </CardContent>
     </Card>
   );
