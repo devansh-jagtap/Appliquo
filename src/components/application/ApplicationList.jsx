@@ -9,6 +9,28 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Trash2 } from "lucide-react";
+import { HiBriefcase } from "react-icons/hi2";
+
+const statusStyles = {
+  Applied: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
+  Interview:
+    "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
+  Offer: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
+  Rejected: "bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-300",
+  "In Progress":
+    "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
+  Accepted:
+    "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
+};
+
+const formatDate = (dateString) => {
+  if (!dateString) return null;
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
 
 const ApplicationList = ({
   applications,
@@ -16,35 +38,55 @@ const ApplicationList = ({
   onDeleteApplication,
 }) => {
   return (
-    <Card>
+    <Card className="h-fit">
       <CardHeader>
-        <CardTitle>Your Applications</CardTitle>
+        <CardTitle>Your Applications ({applications.length})</CardTitle>
       </CardHeader>
       <CardContent>
         {applications.length === 0 ? (
-          <p className="text-center text-muted-foreground py-8">
-            No applications yet
-          </p>
+          <div className="flex flex-col items-center py-12 text-center">
+            <HiBriefcase className="mb-3 h-10 w-10 text-muted-foreground" />
+            <p className="font-medium text-foreground">No applications yet</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Add your first application using the form
+            </p>
+          </div>
         ) : (
-          <div className="space-y-4 grid grid-cols-1 gap-5">
+          <div className="flex flex-col gap-3">
             {applications.map((app) => (
-              <div key={app.id} className="border rounded-lg p-4 space-y-3">
-                <div className="flex justify-between items-start gap-4">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg">{app.company}</h3>
-                    <p className="text-muted-foreground">{app.role}</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Applied on: {app.date}
+              <div
+                key={app.id}
+                className="rounded-lg border border-border bg-background p-4 transition-shadow hover:shadow-sm"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="truncate font-semibold text-foreground">
+                      {app.company}
+                    </h3>
+                    <p className="truncate text-sm text-muted-foreground">
+                      {app.role}
                     </p>
+                    {(app.created_at || app.date) && (
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {formatDate(app.created_at) || app.date}
+                      </p>
+                    )}
+                    <span
+                      className={`mt-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
+                        statusStyles[app.status] || "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      {app.status}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex shrink-0 items-center gap-2">
                     <Select
                       value={app.status}
                       onValueChange={(newStatus) =>
                         onUpdateStatus(app.id, newStatus)
                       }
                     >
-                      <SelectTrigger className="w-[140px]">
+                      <SelectTrigger className="w-[130px] text-xs">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -55,8 +97,9 @@ const ApplicationList = ({
                       </SelectContent>
                     </Select>
                     <Button
-                      variant="destructive"
+                      variant="ghost"
                       size="icon"
+                      className="text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
                       onClick={() => onDeleteApplication(app.id)}
                     >
                       <Trash2 className="h-4 w-4" />

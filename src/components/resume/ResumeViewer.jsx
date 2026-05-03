@@ -118,7 +118,7 @@ export default function ResumeViewer({ resume }) {
 
   if (!resume) {
     return (
-      <div className="flex items-center justify-center h-64 text-gray-500">
+      <div className="flex items-center justify-center h-64 text-muted-foreground">
         Select a resume to view
       </div>
     );
@@ -129,7 +129,7 @@ export default function ResumeViewer({ resume }) {
     if (loading) {
       return (
         <div className="flex items-center justify-center h-64">
-          <p className="text-gray-500">Loading PDF...</p>
+          <p className="text-muted-foreground">Loading PDF...</p>
         </div>
       );
     }
@@ -137,7 +137,7 @@ export default function ResumeViewer({ resume }) {
     if (error) {
       return (
         <div className="flex items-center justify-center h-64">
-          <p className="text-red-500">{error}</p>
+          <p className="text-destructive">{error}</p>
         </div>
       );
     }
@@ -147,11 +147,11 @@ export default function ResumeViewer({ resume }) {
     }
 
     return (
-      <div className="bg-white dark:bg-gray-900 rounded-lg border dark:border-gray-700">
-        <div className="p-4 border-b dark:border-gray-700">
-          <h2 className="text-xl font-bold dark:text-white">{resume.title}</h2>
+      <div className="rounded-lg border border-border bg-card">
+        <div className="border-b border-border p-4">
+          <h2 className="text-xl font-bold text-card-foreground">{resume.title}</h2>
           {numPages && (
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="mt-1 text-sm text-muted-foreground">
               {numPages} page{numPages !== 1 ? "s" : ""}
             </p>
           )}
@@ -164,7 +164,7 @@ export default function ResumeViewer({ resume }) {
             options={documentOptions}
             loading={
               <div className="flex items-center justify-center h-64">
-                <p className="text-gray-500">Loading document...</p>
+                <p className="text-muted-foreground">Loading document...</p>
               </div>
             }
           >
@@ -187,11 +187,11 @@ export default function ResumeViewer({ resume }) {
   // Text resume (content is plain text, not a PDF)
   if (resume.content && !isPdfContent) {
     return (
-      <div className="bg-white dark:bg-gray-900 p-6 rounded-lg border dark:border-gray-700">
-        <h2 className="text-xl font-bold mb-4 dark:text-white">
+      <div className="rounded-lg border border-border bg-card p-6">
+        <h2 className="mb-4 text-xl font-bold text-card-foreground">
           {resume.title}
         </h2>
-        <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed dark:text-gray-200">
+        <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-card-foreground">
           {resume.content}
         </pre>
       </div>
@@ -199,7 +199,7 @@ export default function ResumeViewer({ resume }) {
   }
 
   return (
-    <div className="flex items-center justify-center h-64 text-gray-500">
+    <div className="flex items-center justify-center h-64 text-muted-foreground">
       Unknown resume format
     </div>
   );
