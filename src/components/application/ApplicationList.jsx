@@ -49,7 +49,7 @@ const avatarColors = [
   "bg-indigo-500",
 ];
 
-const getAvatarColor = (name) => {
+const getAvatarColorClass = (name) => {
   if (!name) return avatarColors[0];
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
@@ -125,7 +125,7 @@ const ApplicationList = ({
                   <div className="flex items-center gap-3">
                     {/* Avatar */}
                     <div
-                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white shadow-sm ${getAvatarColor(app.company)}`}
+                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white shadow-sm ${getAvatarColorClass(app.company)}`}
                     >
                       {getInitials(app.company)}
                     </div>

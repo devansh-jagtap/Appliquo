@@ -197,16 +197,19 @@ const Dashboard = () => {
                     <Icon className={`h-5 w-5 ${colors.icon}`} />
                   </div>
                 </div>
-                <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
-                  <div
-                    className={`h-full rounded-full ${colors.bar} opacity-60`}
-                    style={{
-                      width: totalApplications > 0
-                        ? `${Math.round((stat.value / totalApplications) * 100)}%`
-                        : "0%",
-                    }}
-                  />
-                </div>
+                {/* Show proportion bar only for non-total stats */}
+                {stat.color !== "blue" && (
+                  <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
+                    <div
+                      className={`h-full rounded-full ${colors.bar} opacity-60`}
+                      style={{
+                        width: totalApplications > 0
+                          ? `${Math.round((stat.value / totalApplications) * 100)}%`
+                          : "0%",
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             );
           })}
