@@ -13,29 +13,43 @@ const AtsScoreBar = ({ score }) => {
       : pct >= 40
         ? "bg-amber-500"
         : "bg-red-500";
+  const label = pct >= 70 ? "Good" : pct >= 40 ? "Fair" : "Poor";
+  const labelColor =
+    pct >= 70
+      ? "text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30"
+      : pct >= 40
+        ? "text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30"
+        : "text-red-500 dark:text-red-400 bg-red-100 dark:bg-red-900/30";
 
   return (
     <div
-      className="mt-2"
-      aria-label={`ATS Score: ${pct}% - ${pct >= 70 ? "Good" : pct >= 40 ? "Fair" : "Poor"}`}
+      className="mt-2.5"
+      aria-label={`ATS Score: ${pct}% - ${label}`}
     >
-      <div className="mb-1 flex items-center justify-between text-xs">
-        <span className="text-muted-foreground">ATS Score</span>
-        <span
-          className={`font-semibold ${
-            pct >= 70
-              ? "text-green-600 dark:text-green-400"
-              : pct >= 40
-                ? "text-amber-600 dark:text-amber-400"
-                : "text-red-500 dark:text-red-400"
-          }`}
-        >
-          {pct}%
-        </span>
+      <div className="mb-1.5 flex items-center justify-between">
+        <span className="text-xs text-muted-foreground font-medium">ATS Score</span>
+        <div className="flex items-center gap-1.5">
+          <span
+            className={`rounded-full px-1.5 py-0.5 text-xs font-semibold ${labelColor}`}
+          >
+            {label}
+          </span>
+          <span
+            className={`text-xs font-bold ${
+              pct >= 70
+                ? "text-green-600 dark:text-green-400"
+                : pct >= 40
+                  ? "text-amber-600 dark:text-amber-400"
+                  : "text-red-500 dark:text-red-400"
+            }`}
+          >
+            {pct}%
+          </span>
+        </div>
       </div>
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+      <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
         <div
-          className={`h-full rounded-full transition-all duration-500 ${color}`}
+          className={`h-full rounded-full transition-all duration-700 ${color}`}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -101,15 +115,21 @@ export default function ResumeList({ resumes, loading, onResumeDeleted }) {
 
   if (loading) {
     return (
-      <Card>
+      <Card className="overflow-hidden">
+        <div className="h-1 w-full bg-gradient-to-r from-primary/30 via-primary/60 to-primary animate-pulse" />
         <CardHeader>
-          <CardTitle>Your Resumes</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+              <HiDocumentText className="h-5 w-5 text-primary" />
+            </div>
+            Your Resumes
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-20 animate-pulse rounded-lg bg-muted"
+              className="h-24 animate-pulse rounded-xl bg-muted"
             />
           ))}
         </CardContent>
@@ -119,11 +139,14 @@ export default function ResumeList({ resumes, loading, onResumeDeleted }) {
 
   if (resumes.length === 0) {
     return (
-      <Card>
-        <CardContent className="py-12 text-center">
-          <HiDocumentText className="mx-auto h-12 w-12 text-muted-foreground" />
-          <p className="mt-4 text-foreground">No resumes yet</p>
-          <p className="text-sm text-muted-foreground">
+      <Card className="overflow-hidden">
+        <div className="h-1 w-full bg-gradient-to-r from-primary/30 via-primary/60 to-primary" />
+        <CardContent className="py-16 text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+            <HiDocumentText className="h-8 w-8 text-muted-foreground" />
+          </div>
+          <p className="font-semibold text-foreground">No resumes yet</p>
+          <p className="mt-1 text-sm text-muted-foreground">
             Upload your first resume to get started
           </p>
         </CardContent>
@@ -138,9 +161,9 @@ export default function ResumeList({ resumes, loading, onResumeDeleted }) {
         <Button
           variant="outline"
           onClick={() => setViewingResume(null)}
-          className="mb-4"
+          className="gap-2"
         >
-          Back to List
+          ← Back to List
         </Button>
         <ResumeViewer resume={viewingResume} />
       </div>
@@ -148,48 +171,65 @@ export default function ResumeList({ resumes, loading, onResumeDeleted }) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Your Resumes ({resumes.length})</CardTitle>
+    <Card className="overflow-hidden">
+      <div className="h-1 w-full bg-gradient-to-r from-primary/30 via-primary/60 to-primary" />
+      <CardHeader className="pb-4">
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+              <HiDocumentText className="h-5 w-5 text-primary" />
+            </div>
+            Your Resumes
+          </CardTitle>
+          <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+            {resumes.length}
+          </span>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
           {resumes.map((resume) => (
             <div
               key={resume.id}
-              className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-accent/50 transition"
+              className="group rounded-xl border border-border bg-card p-4 transition-all hover:border-primary/30 hover:shadow-sm"
             >
-              <div className="flex items-start gap-3 flex-1 min-w-0">
-                <HiDocumentText className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-foreground truncate">
-                    {resume.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Uploaded {formatDate(resume.created_at)}
-                  </p>
-                  <AtsScoreBar score={resume.ats_score} />
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3 flex-1 min-w-0">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 mt-0.5">
+                    <HiDocumentText className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-foreground truncate text-sm">
+                      {resume.title}
+                    </h3>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Uploaded {formatDate(resume.created_at)}
+                    </p>
+                    <AtsScoreBar score={resume.ats_score} />
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setViewingResume(resume)}
-                  className="text-primary hover:text-primary/80 hover:bg-primary/10"
-                >
-                  <HiEye className="h-5 w-5" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(resume.id)}
-                  disabled={deleting === resume.id}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                >
-                  <HiTrash className="h-5 w-5" />
-                </Button>
+                <div className="flex shrink-0 gap-1 mt-0.5">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setViewingResume(resume)}
+                    className="h-8 w-8 p-0 text-primary hover:text-primary/80 hover:bg-primary/10"
+                    title="View resume"
+                  >
+                    <HiEye className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(resume.id)}
+                    disabled={deleting === resume.id}
+                    className="h-8 w-8 p-0 text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                    title="Delete resume"
+                  >
+                    <HiTrash className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           ))}

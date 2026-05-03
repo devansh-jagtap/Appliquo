@@ -124,67 +124,97 @@ const Dashboard = () => {
     <Layout>
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-          <p className="mt-2 text-muted-foreground">
-            Track and manage your job applications
-          </p>
+        <div className="mb-8 rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-6 border border-primary/10">
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/15 shadow-inner">
+              <HiDocumentText className="h-8 w-8 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+              <p className="mt-1 text-muted-foreground">
+                Track and manage your job applications
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             const colorMap = {
               blue: {
-                bg: "bg-primary/10",
+                gradient: "from-primary/15 to-primary/5",
+                border: "border-primary/20",
+                iconBg: "bg-primary/15",
                 icon: "text-primary",
                 value: "text-primary",
+                bar: "bg-primary",
               },
               amber: {
-                bg: "bg-amber-100 dark:bg-amber-900/30",
+                gradient: "from-amber-500/15 to-amber-500/5",
+                border: "border-amber-500/20",
+                iconBg: "bg-amber-100 dark:bg-amber-900/30",
                 icon: "text-amber-600 dark:text-amber-400",
                 value: "text-amber-600 dark:text-amber-400",
+                bar: "bg-amber-500",
               },
               green: {
-                bg: "bg-green-100 dark:bg-green-900/30",
+                gradient: "from-green-500/15 to-green-500/5",
+                border: "border-green-500/20",
+                iconBg: "bg-green-100 dark:bg-green-900/30",
                 icon: "text-green-600 dark:text-green-400",
                 value: "text-green-600 dark:text-green-400",
+                bar: "bg-green-500",
               },
               red: {
-                bg: "bg-red-100 dark:bg-red-900/30",
+                gradient: "from-red-500/15 to-red-500/5",
+                border: "border-red-500/20",
+                iconBg: "bg-red-100 dark:bg-red-900/30",
                 icon: "text-red-500 dark:text-red-400",
                 value: "text-red-500 dark:text-red-400",
+                bar: "bg-red-500",
               },
             };
             const colors = colorMap[stat.color] || colorMap.blue;
             return (
               <div
                 key={index}
-                className="rounded-xl border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md"
+                className={`group rounded-xl border ${colors.border} bg-gradient-to-br ${colors.gradient} p-5 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5`}
               >
-                <div className="flex items-center justify-between">
+                <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                       {stat.title}
                     </p>
-                    <p className={`mt-2 text-3xl font-bold ${colors.value}`}>
+                    <p className={`mt-2 text-4xl font-extrabold ${colors.value}`}>
                       {stat.value}
                     </p>
                   </div>
                   <div
-                    className={`flex h-12 w-12 items-center justify-center rounded-lg ${colors.bg}`}
+                    className={`flex h-11 w-11 items-center justify-center rounded-lg ${colors.iconBg} shadow-sm`}
                   >
-                    <Icon className={`h-6 w-6 ${colors.icon}`} />
+                    <Icon className={`h-5 w-5 ${colors.icon}`} />
                   </div>
+                </div>
+                <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
+                  <div
+                    className={`h-full rounded-full ${colors.bar} opacity-60`}
+                    style={{
+                      width: totalApplications > 0
+                        ? `${Math.round((stat.value / totalApplications) * 100)}%`
+                        : "0%",
+                    }}
+                  />
                 </div>
               </div>
             );
           })}
         </div>
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Application Form */}
-          <div className="mb-8">
+          <div>
             <ApplicationForm onAddApplication={handleAddApplication} />
           </div>
 

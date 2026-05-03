@@ -12,15 +12,59 @@ import { Trash2 } from "lucide-react";
 import { HiBriefcase } from "react-icons/hi2";
 
 const statusStyles = {
-  Applied: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
-  Interview:
-    "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
-  Offer: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
-  Rejected: "bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-300",
-  "In Progress":
-    "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
-  Accepted:
-    "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
+  Applied: {
+    badge: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800",
+    dot: "bg-blue-500",
+  },
+  Interview: {
+    badge: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 border border-amber-200 dark:border-amber-800",
+    dot: "bg-amber-500",
+  },
+  Offer: {
+    badge: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 border border-green-200 dark:border-green-800",
+    dot: "bg-green-500",
+  },
+  Rejected: {
+    badge: "bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-300 border border-red-200 dark:border-red-800",
+    dot: "bg-red-500",
+  },
+  "In Progress": {
+    badge: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 border border-amber-200 dark:border-amber-800",
+    dot: "bg-amber-500",
+  },
+  Accepted: {
+    badge: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 border border-green-200 dark:border-green-800",
+    dot: "bg-green-500",
+  },
+};
+
+const avatarColors = [
+  "bg-blue-500",
+  "bg-violet-500",
+  "bg-rose-500",
+  "bg-emerald-500",
+  "bg-amber-500",
+  "bg-cyan-500",
+  "bg-pink-500",
+  "bg-indigo-500",
+];
+
+const getAvatarColor = (name) => {
+  if (!name) return avatarColors[0];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return avatarColors[Math.abs(hash) % avatarColors.length];
+};
+
+const getInitials = (name) => {
+  if (!name) return "?";
+  return name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? "")
+    .join("");
 };
 
 const formatDate = (dateString) => {
@@ -38,77 +82,109 @@ const ApplicationList = ({
   onDeleteApplication,
 }) => {
   return (
-    <Card className="h-fit">
-      <CardHeader>
-        <CardTitle>Your Applications ({applications.length})</CardTitle>
+    <Card className="h-fit overflow-hidden">
+      <div className="h-1 w-full bg-gradient-to-r from-primary/30 via-primary/60 to-primary" />
+      <CardHeader className="pb-4">
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+              <HiBriefcase className="h-5 w-5 text-primary" />
+            </div>
+            Applications
+          </CardTitle>
+          {applications.length > 0 && (
+            <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+              {applications.length}
+            </span>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         {applications.length === 0 ? (
-          <div className="flex flex-col items-center py-12 text-center">
-            <HiBriefcase className="mb-3 h-10 w-10 text-muted-foreground" />
-            <p className="font-medium text-foreground">No applications yet</p>
+          <div className="flex flex-col items-center rounded-xl border-2 border-dashed border-border py-12 text-center">
+            <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-muted">
+              <HiBriefcase className="h-7 w-7 text-muted-foreground" />
+            </div>
+            <p className="font-semibold text-foreground">No applications yet</p>
             <p className="mt-1 text-sm text-muted-foreground">
               Add your first application using the form
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
-            {applications.map((app) => (
-              <div
-                key={app.id}
-                className="rounded-lg border border-border bg-background p-4 transition-shadow hover:shadow-sm"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="truncate font-semibold text-foreground">
-                      {app.company}
-                    </h3>
-                    <p className="truncate text-sm text-muted-foreground">
-                      {app.role}
-                    </p>
-                    {(app.created_at || app.date) && (
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {formatDate(app.created_at) || app.date}
+          <div className="flex flex-col gap-2.5">
+            {applications.map((app) => {
+              const style = statusStyles[app.status] ?? {
+                badge: "bg-muted text-muted-foreground border border-border",
+                dot: "bg-muted-foreground",
+              };
+              return (
+                <div
+                  key={app.id}
+                  className="group rounded-xl border border-border bg-card p-3.5 transition-all hover:border-primary/30 hover:shadow-sm"
+                >
+                  <div className="flex items-center gap-3">
+                    {/* Avatar */}
+                    <div
+                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white shadow-sm ${getAvatarColor(app.company)}`}
+                    >
+                      {getInitials(app.company)}
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="truncate font-semibold text-foreground text-sm">
+                          {app.company}
+                        </h3>
+                        <span
+                          className={`hidden shrink-0 rounded-full px-2 py-0.5 text-xs font-medium sm:inline-flex items-center gap-1 ${style.badge}`}
+                        >
+                          <span className={`h-1.5 w-1.5 rounded-full ${style.dot}`} />
+                          {app.status}
+                        </span>
+                      </div>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {app.role}
+                        {(app.created_at || app.date) && (
+                          <span className="ml-2 text-muted-foreground/60">
+                            · {formatDate(app.created_at) || app.date}
+                          </span>
+                        )}
                       </p>
-                    )}
-                    <span
-                      className={`mt-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-                        statusStyles[app.status] || "bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      {app.status}
-                    </span>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    <Select
-                      value={app.status}
-                      onValueChange={(newStatus) =>
-                        onUpdateStatus(app.id, newStatus)
-                      }
-                      aria-label="Update application status"
-                    >
-                      <SelectTrigger className="w-[130px] text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Applied">Applied</SelectItem>
-                        <SelectItem value="Interview">Interview</SelectItem>
-                        <SelectItem value="Offer">Offer</SelectItem>
-                        <SelectItem value="Rejected">Rejected</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
-                      onClick={() => onDeleteApplication(app.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex shrink-0 items-center gap-1.5">
+                      <Select
+                        value={app.status}
+                        onValueChange={(newStatus) =>
+                          onUpdateStatus(app.id, newStatus)
+                        }
+                        aria-label="Update application status"
+                      >
+                        <SelectTrigger className="h-8 w-[110px] text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Applied">Applied</SelectItem>
+                          <SelectItem value="Interview">Interview</SelectItem>
+                          <SelectItem value="Offer">Offer</SelectItem>
+                          <SelectItem value="Rejected">Rejected</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
+                        onClick={() => onDeleteApplication(app.id)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </CardContent>

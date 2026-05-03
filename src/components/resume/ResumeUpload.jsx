@@ -161,40 +161,47 @@ export default function ResumeUpload({ onResumeUploaded }) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Upload Resume</CardTitle>
+    <Card className="overflow-hidden">
+      <div className="h-1 w-full bg-gradient-to-r from-primary via-primary/70 to-primary/30" />
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+            <Upload className="h-4 w-4 text-primary" />
+          </div>
+          Upload Resume
+        </CardTitle>
+        <p className="text-sm text-muted-foreground">Add a new resume to your library</p>
       </CardHeader>
       <CardContent>
         {/* Tab Selector */}
-        <div className="flex gap-2 mb-6 p-1 bg-muted rounded-lg">
+        <div className="flex gap-1.5 mb-5 p-1 bg-muted rounded-lg">
           <button
             type="button"
             onClick={() => setUploadType("text")}
-            className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-all ${
               uploadType === "text"
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            Text Resume
+            Text
           </button>
           <button
             type="button"
             onClick={() => setUploadType("pdf")}
-            className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-all ${
               uploadType === "pdf"
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            PDF Resume
+            PDF
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="title">Resume Title</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="title" className="text-sm font-medium">Resume Title</Label>
             <Input
               id="title"
               type="text"
@@ -207,63 +214,73 @@ export default function ResumeUpload({ onResumeUploaded }) {
           </div>
 
           {uploadType === "text" ? (
-            <div>
-              <Label htmlFor="content">Resume Content</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="content" className="text-sm font-medium">Resume Content</Label>
               <Textarea
                 id="content"
                 placeholder="Paste your resume text here..."
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 disabled={uploading}
-                rows={12}
+                rows={10}
                 required
-                className="font-mono text-sm"
+                className="font-mono text-xs resize-none"
               />
             </div>
           ) : (
-            <div>
-              <Label htmlFor="file-upload">PDF File</Label>
-              <div className="mt-2">
-                <label
-                  htmlFor="file-upload"
-                  className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-card hover:bg-accent/50 border-border transition-colors"
-                >
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <Upload className="w-8 h-8 mb-2 text-muted-foreground" />
-                    <p className="mb-2 text-sm text-muted-foreground">
-                      {file ? (
-                        <span className="font-semibold text-foreground">
-                          {file.name}
-                        </span>
-                      ) : (
-                        <>
-                          <span className="font-semibold">Click to upload</span>{" "}
-                          or drag and drop
-                        </>
-                      )}
-                    </p>
-                    <p className="text-xs text-muted-foreground">PDF only</p>
+            <div className="space-y-1.5">
+              <Label htmlFor="file-upload" className="text-sm font-medium">PDF File</Label>
+              <label
+                htmlFor="file-upload"
+                className={`flex flex-col items-center justify-center w-full h-36 border-2 border-dashed rounded-xl cursor-pointer transition-all ${
+                  file
+                    ? "border-primary/50 bg-primary/5"
+                    : "border-border bg-card hover:bg-accent/40 hover:border-primary/30"
+                }`}
+              >
+                <div className="flex flex-col items-center justify-center gap-2 px-4 text-center">
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-full ${file ? "bg-primary/15" : "bg-muted"}`}>
+                    <Upload className={`h-5 w-5 ${file ? "text-primary" : "text-muted-foreground"}`} />
                   </div>
-                  <input
-                    id="file-upload"
-                    type="file"
-                    accept=".pdf,application/pdf"
-                    onChange={handleFileChange}
-                    disabled={uploading}
-                    className="hidden"
-                    required={uploadType === "pdf"}
-                  />
-                </label>
-              </div>
+                  <p className="text-sm text-muted-foreground">
+                    {file ? (
+                      <span className="font-semibold text-foreground">
+                        {file.name}
+                      </span>
+                    ) : (
+                      <>
+                        <span className="font-semibold text-foreground">Click to upload</span>{" "}
+                        or drag and drop
+                      </>
+                    )}
+                  </p>
+                  <p className="text-xs text-muted-foreground/70">PDF only</p>
+                </div>
+                <input
+                  id="file-upload"
+                  type="file"
+                  accept=".pdf,application/pdf"
+                  onChange={handleFileChange}
+                  disabled={uploading}
+                  className="hidden"
+                  required={uploadType === "pdf"}
+                />
+              </label>
             </div>
           )}
 
-          <Button type="submit" disabled={uploading} className="w-full">
-            {uploading
-              ? "Uploading..."
-              : uploadType === "text"
-                ? "Upload Text Resume"
-                : "Upload PDF Resume"}
+          <Button type="submit" disabled={uploading} className="w-full gap-2 font-semibold">
+            {uploading ? (
+              <>
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                Uploading…
+              </>
+            ) : (
+              <>
+                <Upload className="h-4 w-4" />
+                {uploadType === "text" ? "Upload Text Resume" : "Upload PDF Resume"}
+              </>
+            )}
           </Button>
         </form>
       </CardContent>
