@@ -51,10 +51,10 @@ export default function Resume() {
     <Layout>
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-              <HiDocumentText className="h-7 w-7 text-primary" />
+        <div className="mb-8 rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-6 border border-primary/10">
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/15 shadow-inner">
+              <HiDocumentText className="h-8 w-8 text-primary" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-foreground">My Resumes</h1>
