@@ -7,11 +7,14 @@ import {
   HiClock,
   HiCheckCircle,
   HiXCircle,
+  HiPlus,
+  HiXMark,
 } from "react-icons/hi2";
 import { supabase } from "@/lib/supabase";
 
 const Dashboard = () => {
   const [applications, setApplications] = useState([]);
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     const loadApplications = async () => {
@@ -56,8 +59,10 @@ const Dashboard = () => {
         .order("created_at", { ascending: false });
 
       setApplications(data);
+      setShowForm(false);
     }
   };
+
   const handleUpdateStatus = async (id, newStatus) => {
     const { error } = await supabase
       .from("applications")
@@ -93,141 +98,115 @@ const Dashboard = () => {
     (app) => app.status === "Rejected",
   ).length;
 
-  const stats = [
+  const pipeline = [
     {
-      title: "Total Applications",
-      value: totalApplications,
-      icon: HiDocumentText,
-      color: "blue",
-    },
-    {
-      title: "Pending",
+      label: "Applied",
       value: pendingApplications,
+      color: "text-blue-600 dark:text-blue-400",
+      bg: "bg-blue-500",
+      track: "bg-blue-100 dark:bg-blue-900/30",
       icon: HiClock,
-      color: "amber",
     },
     {
-      title: "Accepted",
+      label: "Accepted",
       value: acceptedApplications,
+      color: "text-emerald-600 dark:text-emerald-400",
+      bg: "bg-emerald-500",
+      track: "bg-emerald-100 dark:bg-emerald-900/30",
       icon: HiCheckCircle,
-      color: "green",
     },
     {
-      title: "Rejected",
+      label: "Rejected",
       value: rejectedApplications,
+      color: "text-rose-500 dark:text-rose-400",
+      bg: "bg-rose-500",
+      track: "bg-rose-100 dark:bg-rose-900/30",
       icon: HiXCircle,
-      color: "red",
     },
   ];
 
   return (
     <Layout>
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8 rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-6 border border-primary/10">
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/15 shadow-inner">
-              <HiDocumentText className="h-8 w-8 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-              <p className="mt-1 text-muted-foreground">
-                Track and manage your job applications
-              </p>
-            </div>
+        {/* Page title row */}
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">
+              My Applications
+            </h1>
+            <p className="mt-0.5 text-sm text-muted-foreground">
+              {totalApplications === 0
+                ? "No applications tracked yet"
+                : `${totalApplications} application${totalApplications !== 1 ? "s" : ""} tracked`}
+            </p>
           </div>
+          <button
+            onClick={() => setShowForm((v) => !v)}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 active:scale-95"
+          >
+            {showForm ? (
+              <>
+                <HiXMark className="h-4 w-4" />
+                Cancel
+              </>
+            ) : (
+              <>
+                <HiPlus className="h-4 w-4" />
+                Add Application
+              </>
+            )}
+          </button>
         </div>
 
-        {/* Stats Cards */}
-        <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat, index) => {
-            const Icon = stat.icon;
-            const colorMap = {
-              blue: {
-                gradient: "from-primary/15 to-primary/5",
-                border: "border-primary/20",
-                iconBg: "bg-primary/15",
-                icon: "text-primary",
-                value: "text-primary",
-                bar: "bg-primary",
-              },
-              amber: {
-                gradient: "from-amber-500/15 to-amber-500/5",
-                border: "border-amber-500/20",
-                iconBg: "bg-amber-100 dark:bg-amber-900/30",
-                icon: "text-amber-600 dark:text-amber-400",
-                value: "text-amber-600 dark:text-amber-400",
-                bar: "bg-amber-500",
-              },
-              green: {
-                gradient: "from-green-500/15 to-green-500/5",
-                border: "border-green-500/20",
-                iconBg: "bg-green-100 dark:bg-green-900/30",
-                icon: "text-green-600 dark:text-green-400",
-                value: "text-green-600 dark:text-green-400",
-                bar: "bg-green-500",
-              },
-              red: {
-                gradient: "from-red-500/15 to-red-500/5",
-                border: "border-red-500/20",
-                iconBg: "bg-red-100 dark:bg-red-900/30",
-                icon: "text-red-500 dark:text-red-400",
-                value: "text-red-500 dark:text-red-400",
-                bar: "bg-red-500",
-              },
-            };
-            const colors = colorMap[stat.color] || colorMap.blue;
+        {/* Inline add form */}
+        {showForm && (
+          <div className="mb-6 rounded-xl border border-border bg-card shadow-sm">
+            <ApplicationForm onAddApplication={handleAddApplication} />
+          </div>
+        )}
+
+        {/* Pipeline stats bar */}
+        <div className="mb-6 grid grid-cols-3 gap-3 sm:gap-4">
+          {pipeline.map((item) => {
+            const Icon = item.icon;
+            const pct =
+              totalApplications > 0
+                ? Math.round((item.value / totalApplications) * 100)
+                : 0;
             return (
               <div
-                key={index}
-                className={`group rounded-xl border ${colors.border} bg-gradient-to-br ${colors.gradient} p-5 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5`}
+                key={item.label}
+                className="rounded-xl border border-border bg-card p-4"
               >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      {stat.title}
-                    </p>
-                    <p className={`mt-2 text-4xl font-extrabold ${colors.value}`}>
-                      {stat.value}
-                    </p>
-                  </div>
-                  <div
-                    className={`flex h-11 w-11 items-center justify-center rounded-lg ${colors.iconBg} shadow-sm`}
-                  >
-                    <Icon className={`h-5 w-5 ${colors.icon}`} />
-                  </div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    {item.label}
+                  </span>
+                  <Icon className={`h-4 w-4 ${item.color}`} />
                 </div>
-                {/* Show proportion bar only for non-total stats */}
-                {stat.color !== "blue" && (
-                  <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
-                    <div
-                      className={`h-full rounded-full ${colors.bar} opacity-60`}
-                      style={{
-                        width: totalApplications > 0
-                          ? `${Math.round((stat.value / totalApplications) * 100)}%`
-                          : "0%",
-                      }}
-                    />
-                  </div>
-                )}
+                <p className={`text-3xl font-extrabold ${item.color}`}>
+                  {item.value}
+                </p>
+                <div className={`mt-3 h-1.5 w-full rounded-full ${item.track}`}>
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${item.bg}`}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground/70">
+                  {pct}% of total
+                </p>
               </div>
             );
           })}
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* Application Form */}
-          <div>
-            <ApplicationForm onAddApplication={handleAddApplication} />
-          </div>
-
-          {/* Applications List */}
-          <ApplicationList
-            applications={applications}
-            onUpdateStatus={handleUpdateStatus}
-            onDeleteApplication={handleDeleteApplication}
-          />
-        </div>
+        {/* Applications list — full width */}
+        <ApplicationList
+          applications={applications}
+          onUpdateStatus={handleUpdateStatus}
+          onDeleteApplication={handleDeleteApplication}
+        />
       </div>
     </Layout>
   );

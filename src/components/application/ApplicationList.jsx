@@ -82,18 +82,15 @@ const ApplicationList = ({
   onDeleteApplication,
 }) => {
   return (
-    <Card className="h-fit overflow-hidden">
-      <div className="h-1 w-full bg-gradient-to-r from-primary/30 via-primary/60 to-primary" />
+    <Card className="overflow-hidden">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-              <HiBriefcase className="h-5 w-5 text-primary" />
-            </div>
-            Applications
+          <CardTitle className="flex items-center gap-2 text-base font-semibold">
+            <HiBriefcase className="h-4 w-4 text-muted-foreground" />
+            All Applications
           </CardTitle>
           {applications.length > 0 && (
-            <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+            <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
               {applications.length}
             </span>
           )}
@@ -107,11 +104,11 @@ const ApplicationList = ({
             </div>
             <p className="font-semibold text-foreground">No applications yet</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Add your first application using the form
+              Click <span className="font-semibold">Add Application</span> above to get started
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col gap-2">
             {applications.map((app) => {
               const style = statusStyles[app.status] ?? {
                 badge: "bg-muted text-muted-foreground border border-border",
@@ -120,67 +117,65 @@ const ApplicationList = ({
               return (
                 <div
                   key={app.id}
-                  className="group rounded-xl border border-border bg-card p-3.5 transition-all hover:border-primary/30 hover:shadow-sm"
+                  className="group flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 transition-all hover:border-primary/20 hover:bg-accent/30"
                 >
-                  <div className="flex items-center gap-3">
-                    {/* Avatar */}
-                    <div
-                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white shadow-sm ${getAvatarColorClass(app.company)}`}
-                    >
-                      {getInitials(app.company)}
-                    </div>
+                  {/* Avatar */}
+                  <div
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white shadow-sm ${getAvatarColorClass(app.company)}`}
+                  >
+                    {getInitials(app.company)}
+                  </div>
 
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h3 className="truncate font-semibold text-foreground text-sm">
-                          {app.company}
-                        </h3>
-                        <span
-                          className={`hidden shrink-0 rounded-full px-2 py-0.5 text-xs font-medium sm:inline-flex items-center gap-1 ${style.badge}`}
-                        >
-                          <span className={`h-1.5 w-1.5 rounded-full ${style.dot}`} />
-                          {app.status}
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <p className="truncate font-semibold text-foreground text-sm">
+                      {app.company}
+                    </p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {app.role}
+                      {(app.created_at || app.date) && (
+                        <span className="ml-1.5 text-muted-foreground/50">
+                          · {formatDate(app.created_at) || app.date}
                         </span>
-                      </div>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {app.role}
-                        {(app.created_at || app.date) && (
-                          <span className="ml-2 text-muted-foreground/60">
-                            · {formatDate(app.created_at) || app.date}
-                          </span>
-                        )}
-                      </p>
-                    </div>
+                      )}
+                    </p>
+                  </div>
 
-                    {/* Actions */}
-                    <div className="flex shrink-0 items-center gap-1.5">
-                      <Select
-                        value={app.status}
-                        onValueChange={(newStatus) =>
-                          onUpdateStatus(app.id, newStatus)
-                        }
-                        aria-label="Update application status"
-                      >
-                        <SelectTrigger className="h-8 w-[110px] text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Applied">Applied</SelectItem>
-                          <SelectItem value="Interview">Interview</SelectItem>
-                          <SelectItem value="Offer">Offer</SelectItem>
-                          <SelectItem value="Rejected">Rejected</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-muted-foreground hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
-                        onClick={() => onDeleteApplication(app.id)}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
+                  {/* Status badge (desktop) */}
+                  <span
+                    className={`hidden shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-flex items-center gap-1 ${style.badge}`}
+                  >
+                    <span className={`h-1.5 w-1.5 rounded-full ${style.dot}`} />
+                    {app.status}
+                  </span>
+
+                  {/* Actions */}
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    <Select
+                      value={app.status}
+                      onValueChange={(newStatus) =>
+                        onUpdateStatus(app.id, newStatus)
+                      }
+                      aria-label="Update application status"
+                    >
+                      <SelectTrigger className="h-8 w-[110px] text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Applied">Applied</SelectItem>
+                        <SelectItem value="Interview">Interview</SelectItem>
+                        <SelectItem value="Offer">Offer</SelectItem>
+                        <SelectItem value="Rejected">Rejected</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-muted-foreground hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
+                      onClick={() => onDeleteApplication(app.id)}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
                   </div>
                 </div>
               );

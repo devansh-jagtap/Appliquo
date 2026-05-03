@@ -1,5 +1,4 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,65 +32,56 @@ const ApplicationForm = ({ onAddApplication }) => {
   };
 
   return (
-    <Card className="h-fit overflow-hidden">
-      <div className="h-1 w-full bg-gradient-to-r from-primary via-primary/70 to-primary/30" />
-      <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-            <HiPlusCircle className="h-5 w-5 text-primary" />
-          </div>
-          Track New Application
-        </CardTitle>
-        <p className="text-sm text-muted-foreground">Add a new job application to your tracker</p>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="p-5">
+      <p className="mb-4 text-sm font-semibold text-foreground">Track New Application</p>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-1.5">
-          <Label htmlFor="company" className="text-sm font-medium">Company Name</Label>
+          <Label htmlFor="company" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Company</Label>
           <Input
             id="company"
-            placeholder="e.g. Google, Microsoft"
+            placeholder="e.g. Google"
             value={companyName}
             onChange={(e) => setCompanyName(e.target.value)}
-            className="transition-shadow focus:shadow-sm"
           />
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="role" className="text-sm font-medium">Role / Position</Label>
+          <Label htmlFor="role" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Role</Label>
           <Input
             id="role"
             placeholder="e.g. Software Engineer"
             value={role}
             onChange={(e) => setRole(e.target.value)}
-            className="transition-shadow focus:shadow-sm"
           />
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="status" className="text-sm font-medium">Application Status</Label>
+          <Label htmlFor="status" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Status</Label>
           <Select value={status} onValueChange={setStatus}>
             <SelectTrigger id="status">
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Applied">🟦 Applied</SelectItem>
-              <SelectItem value="Interview">🟨 Interview</SelectItem>
-              <SelectItem value="Offer">🟩 Offer</SelectItem>
-              <SelectItem value="Rejected">🟥 Rejected</SelectItem>
+              <SelectItem value="Applied">Applied</SelectItem>
+              <SelectItem value="Interview">Interview</SelectItem>
+              <SelectItem value="Offer">Offer</SelectItem>
+              <SelectItem value="Rejected">Rejected</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        <Button
-          onClick={handleSubmit}
-          disabled={!companyName || !role}
-          className="w-full gap-2 font-semibold"
-        >
-          <HiPlusCircle className="h-4 w-4" />
-          Add Application
-        </Button>
-      </CardContent>
-    </Card>
+        <div className="flex items-end">
+          <Button
+            onClick={handleSubmit}
+            disabled={!companyName || !role}
+            className="w-full gap-2 font-semibold"
+          >
+            <HiPlusCircle className="h-4 w-4" />
+            Add
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 };
 
