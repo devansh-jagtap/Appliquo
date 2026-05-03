@@ -37,9 +37,9 @@ SKILLS:
 };
 
 const TABS = [
-  { id: "resume", label: "Resume Tips", icon: HiDocumentText, accentClass: "text-emerald-600 dark:text-emerald-400", activeBorder: "border-emerald-500", emptyIcon: HiDocumentText },
-  { id: "coverLetter", label: "Cover Letter", icon: HiPencil, accentClass: "text-blue-600 dark:text-blue-400", activeBorder: "border-blue-500", emptyIcon: HiPencil },
-  { id: "skills", label: "Skill Gaps", icon: HiChartBar, accentClass: "text-amber-600 dark:text-amber-400", activeBorder: "border-amber-500", emptyIcon: HiChartBar },
+  { id: "resume", label: "Resume Tips", icon: HiDocumentText, accentClass: "text-emerald-600 dark:text-emerald-400", activeBorder: "border-emerald-500" },
+  { id: "coverLetter", label: "Cover Letter", icon: HiPencil, accentClass: "text-blue-600 dark:text-blue-400", activeBorder: "border-blue-500" },
+  { id: "skills", label: "Skill Gaps", icon: HiChartBar, accentClass: "text-amber-600 dark:text-amber-400", activeBorder: "border-amber-500" },
 ];
 
 const Assistant = () => {
@@ -235,7 +235,7 @@ const Assistant = () => {
               ) : (
                 <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-muted-foreground">
                   {activeTabConfig && (
-                    <activeTabConfig.emptyIcon className="h-10 w-10 opacity-20" />
+                    <activeTabConfig.icon className="h-10 w-10 opacity-20" />
                   )}
                   <p className="text-sm">
                     Fill in the inputs on the left, then click{" "}
