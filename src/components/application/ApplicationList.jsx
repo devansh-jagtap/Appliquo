@@ -85,6 +85,7 @@ const ApplicationList = ({
                       onValueChange={(newStatus) =>
                         onUpdateStatus(app.id, newStatus)
                       }
+                      aria-label="Update application status"
                     >
                       <SelectTrigger className="w-[130px] text-xs">
                         <SelectValue />

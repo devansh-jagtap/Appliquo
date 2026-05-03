@@ -15,7 +15,10 @@ const AtsScoreBar = ({ score }) => {
         : "bg-red-500";
 
   return (
-    <div className="mt-2">
+    <div
+      className="mt-2"
+      aria-label={`ATS Score: ${pct}% - ${pct >= 70 ? "Good" : pct >= 40 ? "Fair" : "Poor"}`}
+    >
       <div className="mb-1 flex items-center justify-between text-xs">
         <span className="text-muted-foreground">ATS Score</span>
         <span
